@@ -281,6 +281,7 @@ final class CalculatorViewModel: ObservableObject {
 
                 isEnteringSecondDate = true
                 isComposingRHSDate = false
+                rhs = nil
 
                 expression = formatter.displayResult(lhs!).main + " \(newOp.rawValue)"
                 updateDisplayFromState()
@@ -322,12 +323,43 @@ final class CalculatorViewModel: ObservableObject {
         }
     }
 
-    // MARK: - Equals ✅ PRO Premium
+    private func finalizeComposedDateIfNeeded(assignToRHS: Bool) {
+        guard
+            composingDate.year != nil,
+            composingDate.month != nil,
+            composingDate.day != nil
+        else { return }
+
+        var comps = composingDate
+        comps.hour = 0
+        comps.minute = 0
+        comps.second = 0
+
+        guard let date = options.calendar.date(from: comps) else { return }
+
+        let v: TDValue = .date(date)
+
+        if assignToRHS {
+            rhs = v
+        } else {
+            lhs = v
+        }
+
+        composingDate = DateComponents()
+        composingTime = DateComponents()
+        isComposingDateTime = false
+        isComposingRHSDate = false
+    }
+
+    
+    // MARK: - Equals ✅ PRO Premium (FINAL & SAFE)
     func tapEquals() {
-        
-        // ✅ Validation finale RHS (date composée par unités)
+
+        // =========================================================
+        // 1️⃣ FINALISATION UNIQUE DE LA RHS (date par unités)
+        // =========================================================
         if rhs == nil,
-           op != nil,
+           isEnteringSecondDate,
            composingDate.year != nil,
            composingDate.month != nil,
            composingDate.day != nil {
@@ -341,39 +373,63 @@ final class CalculatorViewModel: ObservableObject {
                 rhs = .date(date)
             }
 
+            // 🔒 reset composition
             composingDate = DateComponents()
             composingTime = DateComponents()
             isComposingDateTime = false
+            isComposingRHSDate = false
         }
 
         do {
 
-            // 🔁 CASIO repeat "="
-            if rhs == nil, let lastOp, let lastRhs, let lhs {
+            // =====================================================
+            // 2️⃣ CASIO "=" répété (NOMBRES UNIQUEMENT)
+            // =====================================================
+            if rhs == nil,
+               buffer.isEmpty,
+               let lhs,
+               let lastOp,
+               let lastRhs,
+               case .number = lhs {
+
                 let result = try engine.compute(lhs, lastOp, lastRhs)
 
-                displayResult = formatter.displayResult(result)
                 self.lhs = result
+                displayResult = formatter.displayResult(result)
                 didJustEvaluate = true
                 setWeekdayIfDate(result)
                 return
             }
 
-            // Commit RHS uniquement si l'utilisateur a réellement tapé quelque chose
-            if rhs == nil && !buffer.isEmpty {
+            // =====================================================
+            // 3️⃣ Commit RHS clavier (ex: 14/12/2025)
+            // =====================================================
+            if rhs == nil, !buffer.isEmpty {
                 try commitCurrentEntryIfNeeded(defaultIfEmpty: false)
             }
 
-            guard let lhs, let rhs, let op else { return }
+            // =====================================================
+            // 4️⃣ GARDE FINALE (AUCUN "=" MUET)
+            // =====================================================
+            guard let lhs, let rhs, let op else {
+                throw CalcError.invalidOperation
+            }
 
+            // =====================================================
+            // 5️⃣ CALCUL
+            // =====================================================
             let result = try engine.compute(lhs, op, rhs)
             displayResult = formatter.displayResult(result)
 
-            // ✅ CASIO memory
-            self.lastOp = op
-            self.lastRhs = rhs
+            // =====================================================
+            // 6️⃣ MÉMOIRE CASIO
+            // =====================================================
+            lastOp = op
+            lastRhs = rhs
 
-            // Chaînage
+            // =====================================================
+            // 7️⃣ CHAÎNAGE
+            // =====================================================
             self.lhs = result
             self.rhs = nil
             self.op  = nil
@@ -381,10 +437,8 @@ final class CalculatorViewModel: ObservableObject {
             buffer = ""
             expression = ""
             didJustEvaluate = true
-
-            // 🔒 FIN DE SAISIE DE LA SECONDE DATE
             isEnteringSecondDate = false
-            
+
             setWeekdayIfDate(result)
 
         } catch {
@@ -392,6 +446,7 @@ final class CalculatorViewModel: ObservableObject {
             weekday = nil
         }
     }
+
 
     // MARK: - Today
     func tapToday() {
@@ -530,3 +585,4 @@ final class CalculatorViewModel: ObservableObject {
         }
     }
 }
+

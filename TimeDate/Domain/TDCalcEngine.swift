@@ -29,7 +29,7 @@ struct TDCalcEngine {
             guard y != 0 else { throw CalcError.invalidOperation }
             return .number(x / y)
 
-            // MARK: - Date − Date (PRO Premium, human diff)
+            // MARK: - Date − Date (PRO Premium, human exact)
             case let (.date(d1), .sub, .date(d2)):
                 let cal = options.calendar
 
@@ -37,7 +37,7 @@ struct TDCalcEngine {
                 let start = cal.startOfDay(for: min(d1, d2))
                 let end   = cal.startOfDay(for: max(d1, d2))
 
-                // Différence calendaire exacte
+                // 📐 Différence calendaire exacte
                 let comps = cal.dateComponents(
                     [.year, .month, .day],
                     from: start,
@@ -48,22 +48,22 @@ struct TDCalcEngine {
                 let months = comps.month ?? 0
                 var days   = comps.day   ?? 0
 
-                // 🔥 Différence humaine (exclusive)
-                days = max(0, days - 1)
-
+                // 🔥 Inclusive / Exclusive
                 if options.inclusiveDiff {
                     days += 1
                 }
 
-                // Conversion canonique en secondes (affichage piloté ailleurs)
-                let totalDays =
-                    years * 365 +
-                    months * 30 +
-                    days
-
+                // 🧮 Construction canonique via Calendar (AUCUNE approximation)
                 return .duration(
-                    TDDuration(seconds: totalDays * 86_400)
+                    TDDuration(
+                        years: years,
+                        months: months,
+                        days: days,
+                        reference: start,
+                        calendar: cal
+                    )
                 )
+
 
         // MARK: - Date ± Duration
         case let (.date(date), .add, .duration(dur)):
