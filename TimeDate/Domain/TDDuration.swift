@@ -4,45 +4,31 @@
 //
 //  Created by Daniel PHAM-LE-THANH on 12/12/2025.
 //
-//  PRO / Premium – Calendar-exact & stable
+//  PRO / Premium — Canonical & Stable
 //
 
 import Foundation
 
+/// Canonical duration type.
+/// - Internal storage: seconds only
+/// - No Calendar
+/// - No UI logic
+/// - No approximation
 struct TDDuration: Equatable {
 
-    /// Stockage canonique : secondes (>= 0)
+    /// Canonical storage (>= 0)
     let seconds: Int
 
-    // MARK: - Initialisation simple (secondes)
+    // MARK: - Init
+
     init(seconds: Int = 0) {
         self.seconds = max(0, seconds)
     }
 
-    // MARK: - Initialisation calendaire exacte (PRO Premium)
-    init(
-        years: Int = 0,
-        months: Int = 0,
-        days: Int = 0,
-        hours: Int = 0,
-        minutes: Int = 0,
-        seconds: Int = 0,
-        reference: Date,
-        calendar: Calendar
-    ) {
-        var date = reference
+    // MARK: - Decomposition (low-level, math only)
 
-        date = calendar.date(byAdding: .year,   value: years,   to: date) ?? date
-        date = calendar.date(byAdding: .month,  value: months,  to: date) ?? date
-        date = calendar.date(byAdding: .day,    value: days,    to: date) ?? date
-        date = calendar.date(byAdding: .hour,   value: hours,   to: date) ?? date
-        date = calendar.date(byAdding: .minute, value: minutes, to: date) ?? date
-        date = calendar.date(byAdding: .second, value: seconds, to: date) ?? date
-
-        self.seconds = max(0, Int(date.timeIntervalSince(reference)))
-    }
-
-    // MARK: - Décomposition simple (affichage bas niveau)
+    /// Decompose seconds into days / hours / minutes / seconds
+    /// (Used by formatter)
     func components() -> DateComponents {
         var remaining = seconds
 
