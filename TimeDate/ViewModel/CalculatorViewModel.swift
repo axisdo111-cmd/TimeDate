@@ -222,69 +222,80 @@ final class CalculatorViewModel: ObservableObject {
         }
     }
 
-
-    // MARK: - Equals (EXPERT, SAFE, NO SILENT)
     
+    // MARK: - Equals ✅ PRO Premium (CASIO + Date safe)
     func tapEquals() {
         do {
-            // 1) Date-Time: finalize RHS draft if needed
-            if op != nil {
-                // Commit RHS uniquement si quelque chose est en cours
-                if !buffer.isEmpty {
-                    try commitEntryIfNeeded(targetIsRHS: true)
-                }
-            }   else {
-                
-                // no op: just commit single entry if buffer exists
-                if !buffer.isEmpty { 
-                    try commitEntryIfNeeded(targetIsRHS: false) }
-                    displayResult = formatter.displayResult(lhs ?? .number(0))
-                    didJustEvaluate = true
-                    return
-            }
-
-            // 2) CASIO repeat "=" only for pure numbers
-            if rhs == nil,
-                buffer.isEmpty,
-                let lhs,
-                let lastOp,
-                let lastRhs,
-                case .number = lhs {
-                    let result = try engine.compute(lhs, lastOp, lastRhs)
-                    self.lhs = result
-                    displayResult = formatter.displayResult(result)
-                    didJustEvaluate = true
+            // -------------------------------------------------
+            // 0) CASIO repeat "=" : uniquement si on a une mémoire
+            // -------------------------------------------------
+            if buffer.isEmpty, rhs == nil, let lhs, let lastOp, let lastRhs, didJustEvaluate {
+                let result = try engine.compute(lhs, lastOp, lastRhs)
+                self.lhs = result
+                displayResult = formatter.displayResult(result)
+                setWeekdayIfDate(result)
+                didJustEvaluate = true
                 return
             }
 
-            // 3) final guard
+            // -------------------------------------------------
+            // 1) Si pas d'opérateur : juste valider/afficher
+            // -------------------------------------------------
+            if op == nil {
+                if !buffer.isEmpty {
+                    try commitEntryIfNeeded(targetIsRHS: false)
+                }
+                displayResult = formatter.displayResult(lhs ?? .number(0))
+                setWeekdayIfDate(lhs)
+                didJustEvaluate = true
+                return
+            }
+
+            // -------------------------------------------------
+            // 2) Finaliser RHS si nécessaire (buffer / drafts)
+            //    ⚠️ On commit RHS seulement s'il manque encore.
+            // -------------------------------------------------
+            if rhs == nil {
+                try commitEntryIfNeeded(targetIsRHS: true)
+            }
+
+            // -------------------------------------------------
+            // 3) Garde finale
+            // -------------------------------------------------
             guard let lhs, let rhs, let op else {
                 throw CalcError.invalidOperation
             }
 
-            // 4) compute
+            // -------------------------------------------------
+            // 4) Calcul
+            // -------------------------------------------------
             let result = try engine.compute(lhs, op, rhs)
             displayResult = formatter.displayResult(result)
             setWeekdayIfDate(result)
 
-            // 5) CASIO memory (numbers only)
+            // -------------------------------------------------
+            // 5) Mémoire CASIO (uniquement pour nombres)
+            // -------------------------------------------------
             if case .number = lhs, case .number = rhs {
                 self.lastOp = op
                 self.lastRhs = rhs
             } else {
+                // protège Date-Date, Date-Duration etc.
                 self.lastOp = nil
-                self.lastRhs = nil     // Protège Date - Date
+                self.lastRhs = nil
             }
 
-            // 6) chain
+            // -------------------------------------------------
+            // 6) Chaînage
+            // -------------------------------------------------
             self.lhs = result
             self.rhs = nil
-            self.op = nil
+            self.op  = nil
             buffer = ""
             expression = ""
             didJustEvaluate = true
 
-            // reset RHS drafts
+            // Reset drafts RHS (sécurité)
             rhsIntent = .unknown
             rhsDateDraft = DateComponents()
             rhsDurationDraft.reset()
