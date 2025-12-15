@@ -7,6 +7,13 @@
 //  PRO / Premium - Stable & clean
 //
 
+//
+//  CalculatorViewModel.swift
+//  TimeDate
+//
+//  PRO / Premium - Clean, deterministic, Date-safe
+//
+
 import SwiftUI
 
 @MainActor
@@ -16,28 +23,19 @@ final class CalculatorViewModel: ObservableObject {
     @Published var mode: TDMode = .calc
     @Published var inclusiveDiff: Bool = false
     @Published var expression: String = ""
-    @Published var weekday: Int? = nil              // 0..6 for WeekdayBarView (Dim..Sam)
+    @Published var weekday: Int? = nil              // 0..6 (Dim..Sam)
     @Published var didJustEvaluate: Bool = false
+    @Published var displayResult: TDDisplayResult = TDDisplayResult(main: "0", secondary: nil)
 
-    @Published var displayResult: TDDisplayResult =
-        TDDisplayResult(main: "0", secondary: nil)
-
-    // MARK: - Internal State
-    private var buffer: String = ""                 // raw typing for numbers or manual date/time
+    // MARK: - Core state
+    private var buffer: String = ""                 // saisie brute (nombres / dates au clavier)
     private var lhs: TDValue? = nil
     private var rhs: TDValue? = nil
     private var op: TDOperator? = nil
-    
-    // MARK: - CASIO repeat support
-    private var lastOp: TDOperator? = nil
-    private var lastRhs: TDValue? = nil
 
-    // DATE-TIME composing (Calendar-based)
-    private var composingDate = DateComponents()    // year/month/day
-    private var composingTime = DateComponents()    // hour/minute/second
-    private var isComposingDateTime = false
-    private var isComposingRHSDate = false
-    private var isEnteringSecondDate = false
+    // MARK: - Date composing by units (JJ / MM / AAAA)
+    private var composingDate = DateComponents()    // day/month/year
+    private var isComposingDate = false             // on affiche l’intermédiaire (ex: "14 Days 12 Months")
 
     // Options / helpers
     private var options = TDOptions()
@@ -56,36 +54,28 @@ final class CalculatorViewModel: ObservableObject {
         options.inclusiveDiff = on
     }
 
-    // MARK: - Digits
+    // MARK: - Digits / separators
     func tapDigit(_ d: String) {
-        if didJustEvaluate {
-            clear(keepMode: true, keepInclusive: true)
-        }
+        if didJustEvaluate { clear(keepMode: true, keepInclusive: true) }
         buffer.append(d)
         updateDisplayFromState()
     }
 
     func tapDot() {
-        if didJustEvaluate {
-            clear(keepMode: true, keepInclusive: true)
-        }
+        if didJustEvaluate { clear(keepMode: true, keepInclusive: true) }
         guard !buffer.contains(".") else { return }
         buffer = buffer.isEmpty ? "0." : (buffer + ".")
         updateDisplayFromState()
     }
 
     func tapSeparatorSlash() {
-        if didJustEvaluate {
-            clear(keepMode: true, keepInclusive: true)
-        }
+        if didJustEvaluate { clear(keepMode: true, keepInclusive: true) }
         buffer.append("/")
         updateDisplayFromState()
     }
 
     func tapSeparatorColon() {
-        if didJustEvaluate {
-            clear(keepMode: true, keepInclusive: true)
-        }
+        if didJustEvaluate { clear(keepMode: true, keepInclusive: true) }
         buffer.append(":")
         updateDisplayFromState()
     }
@@ -102,334 +92,219 @@ final class CalculatorViewModel: ObservableObject {
             return
         }
 
-        // Si on composait une date/heure via unités : reset composition
-        if isComposingDateTime {
+        if isComposingDate {
             composingDate = DateComponents()
-            composingTime = DateComponents()
-            isComposingDateTime = false
+            isComposingDate = false
             weekday = nil
             updateDisplayFromState()
         }
     }
 
-    // MARK: - Units (DATE-TIME composing) ✅ Calendar-based
+    // MARK: - Units
     func tapUnit(_ unit: UnitKind) {
         mode = .dateTime
-        
         didJustEvaluate = false
-        // isComposingDateTime sera défini selon le type d'input (date vs durée)
 
         let value = Int(buffer) ?? 0
         buffer = ""
-        
-        // ✅ Début de saisie RHS par unités (DATE)
-        if op != nil, rhs == nil, !isComposingRHSDate {
-            isComposingRHSDate = true
-            isComposingDateTime = true
-            composingDate = DateComponents()
-            composingTime = DateComponents()
+
+        // 1) Si on est dans une expression Date ? (lhs=date et op=+/-)
+        let lhsIsDate: Bool = {
+            if let lhs, case .date = lhs { return true }
+            return false
+        }()
+
+        let opIsPlusMinus: Bool = (op == .add || op == .sub)
+
+        // 2) Si on a déjà une RHS en "durée days" mais que l’utilisateur enchaine avec Months/Years
+        //    => on bascule automatiquement en "seconde date" (14 Days + 12 Months + 2025 Years)
+        if lhsIsDate, opIsPlusMinus, rhs != nil, isComposingDate == false {
+            if case .duration(let d) = rhs, unit == .months || unit == .years {
+                // migration: seulement si la durée est un nombre entier de jours
+                let days = d.seconds / 86_400
+                if days * 86_400 == d.seconds, (1...31).contains(days) {
+                    rhs = nil
+                    composingDate = DateComponents()
+                    composingDate.day = days
+                    isComposingDate = true
+                }
+            }
         }
-        
-        switch unit {
 
-        // MARK: - DATE
-        case .years:
-            composingDate.year = value
+        // 3) Cas Date ± (Days/Weeks/Months/Years)  => RHS = duration
+        if lhsIsDate, opIsPlusMinus, rhs == nil, isComposingDate == false {
+            switch unit {
+            case .days:
+                rhs = .duration(TDDuration(seconds: signedSeconds(days: value)))
+                displayResult = formatter.displayResult(rhs!)
+                weekday = nil
+                return
 
-        case .months:
-            composingDate.month = value
+            case .weeks:
+                rhs = .duration(TDDuration(seconds: signedSeconds(days: value * 7)))
+                displayResult = formatter.displayResult(rhs!)
+                weekday = nil
+                return
 
-        case .days:
-            // 🟢 Si on compose une date RHS → jour du mois
-            if isComposingDateTime {
+            case .months, .years:
+                // Ici on ne passe PAS par des secondes (mois/années variables).
+                // On encode months/years en "duration" via TDDuration init calendar-based
+                // mais seulement pour Date ± Duration -> TDCalcEngine doit gérer via Calendar.
+                let cal = options.calendar
+                let ref = Date() // reference neutre (TDDuration stocke des secondes, mais on n’en dépend pas ici)
+                let dur: TDDuration
+                if unit == .months {
+                    dur = TDDuration(months: value * (op == .sub ? -1 : 1), reference: ref, calendar: cal)
+                } else {
+                    dur = TDDuration(years: value * (op == .sub ? -1 : 1), reference: ref, calendar: cal)
+                }
+                rhs = .duration(dur)
+                displayResult = formatter.displayResult(rhs!)
+                weekday = nil
+                return
+
+            default:
+                break
+            }
+        }
+
+        // 4) Cas saisie d’une date par unités (lhs ou rhs) : JJ/MM/AAAA
+        if unit == .days || unit == .months || unit == .years {
+
+            isComposingDate = true
+
+            switch unit {
+            case .days:
                 composingDate.day = value
+            case .months:
+                composingDate.month = value
+            case .years:
+                composingDate.year = value
+            default:
                 break
             }
 
-            // 🔵 Sinon → durée (Date ± Days)
-            if let lhs, op != nil, case .date = lhs {
-                let v: TDValue = .duration(TDDuration(seconds: value * 86_400))
-                rhs = v
-                displayResult = formatter.displayResult(v)
+            // Affichage intermédiaire tant que la date n’est pas complète
+            guard
+                composingDate.day != nil,
+                composingDate.month != nil,
+                composingDate.year != nil
+            else {
+                displayResult = TDDisplayResult(
+                    main: [
+                        composingDate.day.map { "\($0) Days" },
+                        composingDate.month.map { "\($0) Months" },
+                        composingDate.year.map { "\($0) Years" }
+                    ]
+                    .compactMap { $0 }
+                    .joined(separator: " "),
+                    secondary: nil
+                )
                 weekday = nil
                 return
             }
 
-            // Sinon → composition de date
-            composingDate.day = value
+            // Date complète -> construire à minuit (aucune heure visible)
+            var comps = composingDate
+            comps.hour = 0
+            comps.minute = 0
+            comps.second = 0
+            comps.calendar = options.calendar
+            comps.timeZone = options.calendar.timeZone
 
-        // MARK: - TIME
-        case .hours:
-            if let lhs, op != nil, case .date = lhs {
-                let dur = TDDuration(seconds: value * 3_600)
-                let v: TDValue = .duration(dur)
-                rhs = v
-                displayResult = formatter.displayResult(v)
-                weekday = nil
-                return
-            }
-            composingTime.hour = value
-
-        case .minutes:
-            if let lhs, op != nil, case .date = lhs {
-                let dur = TDDuration(seconds: value * 60)
-                let v: TDValue = .duration(dur)
-                rhs = v
-                displayResult = formatter.displayResult(v)
-                weekday = nil
-                return
-            }
-            composingTime.minute = value
-
-        case .seconds:
-            if let lhs, op != nil, case .date = lhs {
-                let dur = TDDuration(seconds: value)
-                let v: TDValue = .duration(dur)
-                rhs = v
-                displayResult = formatter.displayResult(v)
-                weekday = nil
-                return
-            }
-            composingTime.second = value
-
-
-        // MARK: - Weeks = duration pure (pas une date)
-        case .weeks:
-            if let lhs, op != nil, case .date = lhs {
-                let signed = (op == .sub ? -value : value)
-                let dur = TDDuration(seconds: signed * 7 * 86_400)
-                let v: TDValue = .duration(dur)
-
-                rhs = v
-                displayResult = formatter.displayResult(v)
+            guard let date = options.calendar.date(from: comps) else {
+                displayResult = TDDisplayResult(main: "Date invalide", secondary: nil)
                 weekday = nil
                 return
             }
 
-            // sinon : durée pure (pas une date)
-            let dur = TDDuration(seconds: value * 7 * 86_400)
-            let v: TDValue = .duration(dur)
-            lhs = v
+            let v: TDValue = .date(date)
+
+            // Affectation déterministe
+            if lhs == nil {
+                lhs = v
+            } else if op != nil {
+                rhs = v
+            } else {
+                lhs = v
+            }
+
+            composingDate = DateComponents()
+            isComposingDate = false
+
             displayResult = formatter.displayResult(v)
-            weekday = nil
-            return
-
-        }
-
-        // MARK: - Construire une Date seulement si Y/M/D sont présents
-        guard
-            composingDate.year != nil,
-            composingDate.month != nil,
-            composingDate.day != nil
-        else {
-            // Affichage intermédiaire lisible (sans calcul)
-            displayResult = TDDisplayResult(
-                main: [
-                    composingDate.day.map { "\($0) Days" },
-                    composingDate.month.map { "\($0) Months" },
-                    composingDate.year.map { "\($0) Years" }
-                ]
-                .compactMap { $0 }
-                .joined(separator: " "),
-                secondary: nil
-            )
-            weekday = nil
+            setWeekdayIfDate(v)
             return
         }
 
-        // 🔒 Date complète → construction
-        var comps = composingDate
-        comps.hour = 0
-        comps.minute = 0
-        comps.second = 0
-
-        guard let date = options.calendar.date(from: comps) else {
-            displayResult = TDDisplayResult(main: "Date invalide", secondary: nil)
-            weekday = nil
-            return
+        // 5) Durées pures (heures/min/sec) => duration
+        switch unit {
+        case .hours:
+            commitDuration(seconds: value * 3_600)
+        case .minutes:
+            commitDuration(seconds: value * 60)
+        case .seconds:
+            commitDuration(seconds: value)
+        case .weeks:
+            commitDuration(seconds: value * 7 * 86_400)
+        default:
+            // rien
+            break
         }
-
-        let v: TDValue = .date(date)
-
-        // ✅ AFFECTATION UNIQUE (CRITIQUE)
-        if isEnteringSecondDate {
-            rhs = v
-        } else {
-            lhs = v
-        }
-
-        // 🔒 Reset composition (sinon chevauchement)
-        composingDate = DateComponents()
-        composingTime = DateComponents()
-        isComposingDateTime = false
-        isComposingRHSDate = false
-
-        displayResult = formatter.displayResult(v)
-        setWeekdayIfDate(v)
-
     }
 
-    
     // MARK: - Operators
     func tapOp(_ newOp: TDOperator) {
+        // 🔒 Dates: seulement + et -
+        if (newOp == .mul || newOp == .div), containsAnyDate() {
+            displayResult = TDDisplayResult(main: "Error", secondary: nil)
+            return
+        }
+
         do {
-
-            // 🔥 CASIO : opérateur après "=" ou "=="
-            if didJustEvaluate {
-                didJustEvaluate = false
-                self.op = newOp
-
-                isEnteringSecondDate = true
-                isComposingRHSDate = false
-                rhs = nil
-
-                expression = formatter.displayResult(lhs!).main + " \(newOp.rawValue)"
-                updateDisplayFromState()
-                self.rhs = nil
-                buffer = ""
-                
-                lastOp = nil
-                lastRhs = nil
-                
-                return
+            // Finaliser ce qui est au buffer (si date au clavier, ou nombre)
+            if !buffer.isEmpty {
+                try commitCurrentEntryIfNeeded(defaultIfEmpty: false)
             }
 
-            // Commit ce que l'utilisateur a tapé
-            let trimmed = buffer.trimmingCharacters(in: .whitespacesAndNewlines)
-
-            // ⚠️ NE PAS COMMIT si lhs existe déjà et buffer vide
-            if !(trimmed.isEmpty && lhs != nil) {
-                try commitCurrentEntryIfNeeded(defaultIfEmpty: op != nil)
-            }
-
-
-            // CASIO immediate execution
+            // Si rhs déjà présent, exécution immédiate "CASIO"
             if let lhs, let op, let rhs {
                 let result = try engine.compute(lhs, op, rhs)
-
                 self.lhs = result
                 self.rhs = nil
-
                 displayResult = formatter.displayResult(result)
                 setWeekdayIfDate(result)
             }
 
             self.op = newOp
-            expression = formatter.displayResult(lhs!).main + " \(newOp.rawValue)"
-            updateDisplayFromState()
+            if let lhs {
+                expression = formatter.displayResult(lhs).main + " \(newOp.rawValue)"
+            } else {
+                expression = ""
+            }
 
         } catch {
             displayResult = TDDisplayResult(main: "Error", secondary: nil)
+            weekday = nil
         }
     }
 
-    private func finalizeComposedDateIfNeeded(assignToRHS: Bool) {
-        guard
-            composingDate.year != nil,
-            composingDate.month != nil,
-            composingDate.day != nil
-        else { return }
-
-        var comps = composingDate
-        comps.hour = 0
-        comps.minute = 0
-        comps.second = 0
-
-        guard let date = options.calendar.date(from: comps) else { return }
-
-        let v: TDValue = .date(date)
-
-        if assignToRHS {
-            rhs = v
-        } else {
-            lhs = v
-        }
-
-        composingDate = DateComponents()
-        composingTime = DateComponents()
-        isComposingDateTime = false
-        isComposingRHSDate = false
-    }
-
-    
-    // MARK: - Equals ✅ PRO Premium (FINAL & SAFE)
+    // MARK: - Equals (FINAL, SIMPLE, RELIABLE)
     func tapEquals() {
-
-        // =========================================================
-        // 1️⃣ FINALISATION UNIQUE DE LA RHS (date par unités)
-        // =========================================================
-        if rhs == nil,
-           isEnteringSecondDate,
-           composingDate.year != nil,
-           composingDate.month != nil,
-           composingDate.day != nil {
-
-            var comps = composingDate
-            comps.hour = 0
-            comps.minute = 0
-            comps.second = 0
-
-            if let date = options.calendar.date(from: comps) {
-                rhs = .date(date)
-            }
-
-            // 🔒 reset composition
-            composingDate = DateComponents()
-            composingTime = DateComponents()
-            isComposingDateTime = false
-            isComposingRHSDate = false
-        }
-
         do {
-
-            // =====================================================
-            // 2️⃣ CASIO "=" répété (NOMBRES UNIQUEMENT)
-            // =====================================================
-            if rhs == nil,
-               buffer.isEmpty,
-               let lhs,
-               let lastOp,
-               let lastRhs,
-               case .number = lhs {
-
-                let result = try engine.compute(lhs, lastOp, lastRhs)
-
-                self.lhs = result
-                displayResult = formatter.displayResult(result)
-                didJustEvaluate = true
-                setWeekdayIfDate(result)
-                return
-            }
-
-            // =====================================================
-            // 3️⃣ Commit RHS clavier (ex: 14/12/2025)
-            // =====================================================
+            // Si l’utilisateur a tapé une date au clavier pour la RHS (14/12/2025)
             if rhs == nil, !buffer.isEmpty {
                 try commitCurrentEntryIfNeeded(defaultIfEmpty: false)
             }
 
-            // =====================================================
-            // 4️⃣ GARDE FINALE (AUCUN "=" MUET)
-            // =====================================================
             guard let lhs, let rhs, let op else {
-                throw CalcError.invalidOperation
+                displayResult = TDDisplayResult(main: "Error", secondary: nil)
+                return
             }
 
-            // =====================================================
-            // 5️⃣ CALCUL
-            // =====================================================
             let result = try engine.compute(lhs, op, rhs)
+
             displayResult = formatter.displayResult(result)
-
-            // =====================================================
-            // 6️⃣ MÉMOIRE CASIO
-            // =====================================================
-            lastOp = op
-            lastRhs = rhs
-
-            // =====================================================
-            // 7️⃣ CHAÎNAGE
-            // =====================================================
             self.lhs = result
             self.rhs = nil
             self.op  = nil
@@ -437,8 +312,6 @@ final class CalculatorViewModel: ObservableObject {
             buffer = ""
             expression = ""
             didJustEvaluate = true
-            isEnteringSecondDate = false
-
             setWeekdayIfDate(result)
 
         } catch {
@@ -447,34 +320,29 @@ final class CalculatorViewModel: ObservableObject {
         }
     }
 
-
     // MARK: - Today
     func tapToday() {
         mode = .dateTime
-
-        let date = Date()
+        let date = options.calendar.startOfDay(for: Date())
         let v: TDValue = .date(date)
 
         lhs = v
         rhs = nil
-        op = nil
+        op  = nil
 
         buffer = ""
         composingDate = DateComponents()
-        composingTime = DateComponents()
-        isComposingDateTime = false
+        isComposingDate = false
 
         displayResult = formatter.displayResult(v)
-        weekday = weekdayIndex(from: date)
+        setWeekdayIfDate(v)
 
         expression = ""
         didJustEvaluate = true
     }
 
     // MARK: - Clear
-    func clear() {
-        clear(keepMode: true, keepInclusive: true)
-    }
+    func clear() { clear(keepMode: true, keepInclusive: true) }
 
     private func clear(keepMode: Bool, keepInclusive: Bool) {
         if !keepMode { mode = .calc }
@@ -488,13 +356,8 @@ final class CalculatorViewModel: ObservableObject {
         rhs = nil
         op = nil
 
-        // 🔥 RESET CASIO MEMORY
-        lastOp = nil
-        lastRhs = nil
-
         composingDate = DateComponents()
-        composingTime = DateComponents()
-        isComposingDateTime = false
+        isComposingDate = false
 
         expression = ""
         weekday = nil
@@ -502,30 +365,8 @@ final class CalculatorViewModel: ObservableObject {
         didJustEvaluate = false
     }
 
-    // MARK: - Commit logic
+    // MARK: - Commit
     private func commitCurrentEntryIfNeeded(defaultIfEmpty: Bool) throws {
-
-        // Si l'utilisateur compose via unités, lhs/rhs a déjà été alimenté par tapUnit()
-        // Donc on ne force rien ici.
-        if isComposingDateTime {
-            // ✅ si l'utilisateur a tapé une date complète au clavier, on la valide
-            if buffer.contains("/") {
-                let v = try parser.parse(buffer)
-                if lhs == nil { lhs = v }
-                else if op != nil { rhs = v }
-                else { lhs = v }
-
-                buffer = ""
-                isComposingDateTime = false
-                setWeekdayIfDate(v)
-                updateDisplayFromState()
-                return
-            }
-
-            // sinon : vraie composition par unités → on ne commit pas encore
-            return
-        }
-
         let trimmed = buffer.trimmingCharacters(in: .whitespacesAndNewlines)
 
         if trimmed.isEmpty {
@@ -537,20 +378,15 @@ final class CalculatorViewModel: ObservableObject {
                 buffer = ""
                 updateDisplayFromState()
                 return
-            } else {
-                throw CalcError.invalidOperation
             }
+            throw CalcError.invalidOperation
         }
 
         let v = try parser.parse(trimmed)
 
-        if lhs == nil {
-            lhs = v
-        } else if op != nil {
-            rhs = v
-        } else {
-            lhs = v
-        }
+        if lhs == nil { lhs = v }
+        else if op != nil { rhs = v }
+        else { lhs = v }
 
         buffer = ""
         setWeekdayIfDate(v)
@@ -563,7 +399,10 @@ final class CalculatorViewModel: ObservableObject {
             displayResult = TDDisplayResult(main: buffer, secondary: nil)
             return
         }
-
+        if isComposingDate {
+            // déjà géré dans tapUnit
+            return
+        }
         if let lhs {
             displayResult = formatter.displayResult(lhs)
         } else {
@@ -571,7 +410,30 @@ final class CalculatorViewModel: ObservableObject {
         }
     }
 
-    // MARK: - Weekday helpers (Dim..Sam)
+    // MARK: - Helpers
+    private func commitDuration(seconds raw: Int) {
+        let v: TDValue = .duration(TDDuration(seconds: max(0, raw)))
+        if lhs == nil { lhs = v }
+        else if op != nil { rhs = v }
+        else { lhs = v }
+
+        displayResult = formatter.displayResult(v)
+        weekday = nil
+    }
+
+    private func signedSeconds(days: Int) -> Int {
+        let sign = (op == .sub) ? -1 : 1
+        return sign * days * 86_400
+    }
+
+    private func containsAnyDate() -> Bool {
+        if let lhs, case .date = lhs { return true }
+        if let rhs, case .date = rhs { return true }
+        // buffer date au clavier
+        if buffer.contains("/") { return true }
+        return false
+    }
+
     private func weekdayIndex(from date: Date) -> Int {
         options.calendar.component(.weekday, from: date) - 1
     }
@@ -585,4 +447,3 @@ final class CalculatorViewModel: ObservableObject {
         }
     }
 }
-
