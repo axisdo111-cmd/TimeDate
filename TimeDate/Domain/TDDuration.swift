@@ -5,54 +5,43 @@
 //  Created by Daniel PHAM-LE-THANH on 12/12/2025.
 //
 
+//
+//  TDDuration.swift
+//  TimeDate
+//
+//  PRO / Premium - Canonical & DST-safe
+//
+
 import Foundation
 
 struct TDDuration: Equatable {
 
-    /// Stockage canonique : secondes
-    var seconds: Int
+    /// Stockage canonique : secondes (>= 0)
+    let seconds: Int
 
     init(seconds: Int = 0) {
         self.seconds = max(0, seconds)
     }
 
-    // MARK: - Construction à partir de composants humains
-    init(
-        years: Int = 0,
-        months: Int = 0,
-        weeks: Int = 0,
-        days: Int = 0,
-        hours: Int = 0,
-        minutes: Int = 0,
-        seconds: Int = 0,
-        reference: Date = Date(),
-        calendar: Calendar = Calendar(identifier: .gregorian)
-    ) {
-        var date = reference
+    // MARK: - Décomposition mathématique (stable, sans Calendar)
 
-        date = calendar.date(byAdding: .year, value: years, to: date) ?? date
-        date = calendar.date(byAdding: .month, value: months, to: date) ?? date
-        date = calendar.date(byAdding: .weekOfYear, value: weeks, to: date) ?? date
-        date = calendar.date(byAdding: .day, value: days, to: date) ?? date
-        date = calendar.date(byAdding: .hour, value: hours, to: date) ?? date
-        date = calendar.date(byAdding: .minute, value: minutes, to: date) ?? date
-        date = calendar.date(byAdding: .second, value: seconds, to: date) ?? date
+    func components() -> DateComponents {
+        var remaining = seconds
 
-        self.seconds = max(
-            0,
-            Int(date.timeIntervalSince(reference))
-        )
-    }
+        let days = remaining / 86_400
+        remaining %= 86_400
 
-    // MARK: - Décomposition lisible (affichage)
-    func components(calendar: Calendar = Calendar(identifier: .gregorian)) -> DateComponents {
-        let ref = Date(timeIntervalSince1970: 0)
-        let target = Date(timeIntervalSince1970: TimeInterval(seconds))
+        let hours = remaining / 3_600
+        remaining %= 3_600
 
-        return calendar.dateComponents(
-            [.year, .month, .day, .hour, .minute, .second],
-            from: ref,
-            to: target
-        )
+        let minutes = remaining / 60
+        let seconds = remaining % 60
+
+        var comps = DateComponents()
+        comps.day = days
+        comps.hour = hours
+        comps.minute = minutes
+        comps.second = seconds
+        return comps
     }
 }

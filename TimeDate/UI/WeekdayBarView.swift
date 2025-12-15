@@ -8,15 +8,10 @@
 import SwiftUI
 
 struct WeekdayBarView: View {
-    /// weekday Calendar : 1 = Dimanche ... 7 = Samedi
+    /// Index UI : 0 = Dim ... 6 = Sam
     let active: Int?
 
     private let days = ["Dim","Lun","Mar","Mer","Jeu","Ven","Sam"]
-
-    private var activeIndex: Int? {
-        guard let active else { return nil }
-        return active - 1   // ✅ conversion Calendar → index tableau
-    }
 
     var body: some View {
         HStack(spacing: 8) {
@@ -28,7 +23,7 @@ struct WeekdayBarView: View {
                     .background(
                         Capsule()
                             .fill(
-                                activeIndex == i
+                                active == i
                                 ? Color.accentColor.opacity(0.25)
                                 : Color(.tertiarySystemFill)
                             )
@@ -37,4 +32,3 @@ struct WeekdayBarView: View {
         }
     }
 }
-

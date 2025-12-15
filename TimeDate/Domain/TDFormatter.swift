@@ -18,6 +18,23 @@ struct TDFormatter {
 
     let options: TDOptions
 
+    private static let dateFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.locale = Locale(identifier: "fr_FR")
+        f.dateStyle = .medium
+        f.timeStyle = .none
+        return f
+    }()
+
+    private static let timeFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.locale = Locale(identifier: "fr_FR")
+        f.dateStyle = .none
+        f.timeStyle = .short
+        return f
+    }()
+
+    
     // MARK: - Public API
 
     func displayResult(_ value: TDValue) -> TDDisplayResult {
@@ -30,27 +47,22 @@ struct TDFormatter {
             return TDDisplayResult(main: formatDuration(d), secondary: nil)
 
         case .date(let date):
-            // Date en principal, heure en secondaire si elle n'est pas 00:00:00
-            let dateFormatter = DateFormatter()
-            dateFormatter.locale = Locale(identifier: "fr_FR")
-            dateFormatter.dateStyle = .medium
-            dateFormatter.timeStyle = .none
+             let cal = options.calendar
+             let comps = cal.dateComponents([.hour, .minute, .second], from: date)
 
-            let timeFormatter = DateFormatter()
-            timeFormatter.locale = Locale(identifier: "fr_FR")
-            timeFormatter.dateStyle = .none
-            timeFormatter.timeStyle = .short
+             let hasTime =
+                 (comps.minute ?? 0) != 0 ||
+                 (comps.second ?? 0) != 0
 
-            let main = dateFormatter.string(from: date)
+             let main = Self.dateFormatter.string(from: date)
+             let secondary = hasTime
+                 ? Self.timeFormatter.string(from: date)
+                 : nil
 
-            let cal = options.calendar
-            let comps = cal.dateComponents([.hour, .minute, .second], from: date)
-            let hasTime = (comps.hour ?? 0) != 0 || (comps.minute ?? 0) != 0 || (comps.second ?? 0) != 0
-
-            return TDDisplayResult(
-                main: main,
-                secondary: hasTime ? timeFormatter.string(from: date) : nil
-            )
+             return TDDisplayResult(
+                 main: main,
+                 secondary: secondary
+             )
         }
     }
 
@@ -93,55 +105,41 @@ struct TDFormatter {
         return nf.string(from: ns) ?? ns.stringValue
     }
 
-    // MARK: - Duration formatting (Years/Months/Weeks/Days/Hours/Minutes/Seconds)
+    // MARK: - Duration formatting (PRO Premium)
 
     private func formatDuration(_ d: TDDuration) -> String {
-        let s = max(0, d.seconds)
+        let comps = d.components()
 
-        // On décompose via Calendar (gregorien) pour avoir un rendu "humain"
-        // (NB: months/years dépendent du calendrier, c'est voulu ici)
-        let comps = TDDuration(seconds: s).components(calendar: options.calendar)
-
-        let years = comps.year ?? 0
-        let months = comps.month ?? 0
-
-        // day = nombre total de jours "calendaires" dans l'intervalle,
-        // on le transforme en weeks + days pour coller à ton UI
         let totalDays = comps.day ?? 0
-        let weeks = totalDays / 7
-        let days = totalDays % 7
 
-        let hours = comps.hour ?? 0
+        // Décomposition lisible (affichage uniquement)
+        let years  = totalDays / 365
+        let rem1   = totalDays % 365
+
+        let months = rem1 / 30
+        let days   = rem1 % 30
+
+        let hours   = comps.hour   ?? 0
         let minutes = comps.minute ?? 0
         let seconds = comps.second ?? 0
 
         var parts: [String] = []
-        append(&parts, years, "Year")
-        append(&parts, months, "Month")
-        append(&parts, weeks, "Week")
-        append(&parts, days, "Day")
-        append(&parts, hours, "Hour")
-        append(&parts, minutes, "Minute")
-        append(&parts, seconds, "Second")
 
-        // Si tout est à 0 (durée nulle), on affiche "0 Seconds"
-        if parts.isEmpty { return "0 Seconds" }
-        return parts.joined(separator: " ")
-    }
+        if years   > 0 { parts.append("\(years) Year\(years > 1 ? "s" : "")") }
+        if months  > 0 { parts.append("\(months) Month\(months > 1 ? "s" : "")") }
+        if days    > 0 { parts.append("\(days) Day\(days > 1 ? "s" : "")") }
 
-    private func append(_ parts: inout [String], _ value: Int, _ unit: String) {
-        guard value != 0 else { return }
-        if value == 1 {
-            parts.append("1 \(unit)")
-        } else {
-            parts.append("\(value) \(unit)s")
-        }
+        if hours   > 0 { parts.append("\(hours) Hour\(hours > 1 ? "s" : "")") }
+        if minutes > 0 { parts.append("\(minutes) Minute\(minutes > 1 ? "s" : "")") }
+        if seconds > 0 { parts.append("\(seconds) Second\(seconds > 1 ? "s" : "")") }
+
+        return parts.isEmpty ? "0 Days" : parts.joined(separator: " ")
     }
 
     // MARK: - Weekday helper (pour surbrillance)
 
     func weekday(_ date: Date) -> Int {
         // iOS: 1 = Dimanche ... 7 = Samedi
-        options.calendar.component(.weekday, from: date)
+        options.calendar.component(.weekday, from: date) - 1  // 0..6
     }
 }

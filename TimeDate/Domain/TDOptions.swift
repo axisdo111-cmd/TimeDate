@@ -10,14 +10,17 @@ import Foundation
 struct TDOptions {
     var inclusiveDiff: Bool = false
 
+    /// Locale uniquement pour l’affichage
     var locale: Locale = Locale(identifier: "fr_FR")
-    var timeZone: TimeZone = .current
 
-    /// Calendar stable (pas recréé à chaque accès)
+    /// TimeZone FIXE pour une calculatrice (pas de DST, pas de surprises)
+    private let fixedTimeZone = TimeZone(secondsFromGMT: 0)!
+
+    /// Calendar stable, neutre, déterministe
     var calendar: Calendar {
         var cal = Calendar(identifier: .gregorian)
         cal.locale = locale
-        cal.timeZone = timeZone
+        cal.timeZone = fixedTimeZone
         return cal
     }
 }

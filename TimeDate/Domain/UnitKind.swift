@@ -18,13 +18,23 @@ enum UnitKind: CaseIterable {
 
     var title: String {
         switch self {
-        case .years: return "Years"
-        case .months: return "Months"
-        case .weeks: return "Weeks"
-        case .days: return "Days"
-        case .hours: return "Hours"
+        case .years: return "Années"
+        case .months: return "Mois"
+        case .weeks: return "Semaines"
+        case .days: return "Jours"
+        case .hours: return "Heures"
         case .minutes: return "Minutes"
-        case .seconds: return "Seconds"
+        case .seconds: return "Secondes"
         }
     }
+
+    /// Unité dépendante du calendrier
+     var isCalendarBased: Bool {
+         switch self {
+         case .years, .months:
+             return true
+         default:
+             return false
+         }
+     }
 }

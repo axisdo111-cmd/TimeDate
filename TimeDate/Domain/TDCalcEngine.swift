@@ -29,17 +29,41 @@ struct TDCalcEngine {
             guard y != 0 else { throw CalcError.invalidOperation }
             return .number(x / y)
 
-        // MARK: - Date − Date (diff positive)
-        case let (.date(d1), .sub, .date(d2)):
-            let start = min(d1, d2)
-            let end = max(d1, d2)
+            // MARK: - Date − Date (PRO Premium, human diff)
+            case let (.date(d1), .sub, .date(d2)):
+                let cal = options.calendar
 
-            var seconds = Int(end.timeIntervalSince(start))
-            if options.inclusiveDiff {
-                seconds += 86_400 // +1 jour
-            }
+                // 🔒 Normalisation stricte à minuit
+                let start = cal.startOfDay(for: min(d1, d2))
+                let end   = cal.startOfDay(for: max(d1, d2))
 
-            return .duration(TDDuration(seconds: seconds))
+                // Différence calendaire exacte
+                let comps = cal.dateComponents(
+                    [.year, .month, .day],
+                    from: start,
+                    to: end
+                )
+
+                let years  = comps.year  ?? 0
+                let months = comps.month ?? 0
+                var days   = comps.day   ?? 0
+
+                // 🔥 Différence humaine (exclusive)
+                days = max(0, days - 1)
+
+                if options.inclusiveDiff {
+                    days += 1
+                }
+
+                // Conversion canonique en secondes (affichage piloté ailleurs)
+                let totalDays =
+                    years * 365 +
+                    months * 30 +
+                    days
+
+                return .duration(
+                    TDDuration(seconds: totalDays * 86_400)
+                )
 
         // MARK: - Date ± Duration
         case let (.date(date), .add, .duration(dur)):
