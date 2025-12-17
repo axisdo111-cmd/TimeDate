@@ -125,6 +125,14 @@ final class CalculatorViewModel: ObservableObject {
     
     // MARK: - Units (EXPERT)
     func tapUnit(_ unit: UnitKind) {
+        // 🔒 Neutralisation CASIO
+        if op != nil, firstValueKind == .date {
+            // RHS après une date : interdit de créer une date absolue
+            if unit == .years || unit == .months || unit == .days {
+                // Autorisé → quantité
+                // OK
+            }
+        }
         mode = .dateTime
         didJustEvaluate = false
         
@@ -167,6 +175,21 @@ final class CalculatorViewModel: ObservableObject {
 
     // MARK: - Operators
     func tapOp(_ newOp: TDOperator) {
+        // =================================================
+        // 🔒 0) NEUTRALISATION DES TOUCHES (AVANT TOUT)
+        // =================================================
+        if firstValueKind == .date {
+
+            // Date × ou ÷ interdit
+            if newOp == .mul || newOp == .div {
+                displayResult = TDDisplayResult(main: "Error", secondary: nil)
+                return
+            }
+        }
+
+        // =================================================
+        // 1) Logique normale
+        // =================================================
         do {
             // DATE-TIME: only + and -
             if mode == .dateTime, (newOp == .mul || newOp == .div) {
@@ -379,64 +402,85 @@ final class CalculatorViewModel: ObservableObject {
     }
 
     private func applyUnitToRHS(_ unit: UnitKind, _ value: Int) {
-        // Decide intent progressively:
-        // - If user enters "2025 Years" => date intent.
-        // - If user enters huge Days (>31) or Years < 1000 => duration intent.
-        // - If still unknown, store day/month as date draft but don’t finalize until we see the year.
-        switch unit {
-        case .years:
-            if value >= 1000 {
-                rhsIntent = .date
-                rhsDateDraft.year = value
-            } else {
-                rhsIntent = .duration
-                rhsDurationDraft.years = value
+
+        let lhsIsDate: Bool = {
+            guard let lhs else { return false }
+            if case .date = lhs { return true }
+            return false
+        }()
+
+        // =================================================
+        // 🔒 Verrou PREMIUM : Date + Date interdit
+        // MAIS Date - Date doit rester possible
+        // =================================================
+        if lhsIsDate, op == .add {
+            // RHS = quantité/durée uniquement
+            switch unit {
+            case .years:   rhsDurationDraft.years = value
+            case .months:  rhsDurationDraft.months = value
+            case .weeks:   rhsDurationDraft.weeks = value
+            case .days:    rhsDurationDraft.days = value
+            case .hours:   rhsDurationDraft.hours = value
+            case .minutes: rhsDurationDraft.minutes = value
+            case .seconds: rhsDurationDraft.seconds = value
             }
+
+            rhsIntent = .duration
+            return
+        }
+
+        // =================================================
+        // 🟢 Cas normal
+        // - si op == .sub avec LHS date : on autorise date2
+        // - sinon comportement standard
+        // =================================================
+        switch unit {
+
+        // Ces 3 là peuvent être :
+        // - une date absolue (si Y/M/D complets)
+        // - une quantité calendaire (si partiel)
+        case .years:
+            rhsDateDraft.year = value
+            rhsDurationDraft.years = value
 
         case .months:
-            if rhsIntent == .duration {
-                rhsDurationDraft.months = value
-            } else {
-                // unknown or date: keep as date draft
-                rhsDateDraft.month = value
-            }
+            rhsDateDraft.month = value
+            rhsDurationDraft.months = value
 
         case .days:
-            if rhsIntent == .duration {
-                rhsDurationDraft.days = value
-            } else {
-                // unknown or date: keep as date draft
-                rhsDateDraft.day = value
-                // if user typed 90 Days, it can’t be a day-of-month → duration
-                if value > 31 {
-                    rhsIntent = .duration
-                    rhsDurationDraft.days = value
-                    rhsDateDraft.day = nil
-                }
-            }
+            rhsDateDraft.day = value
+            rhsDurationDraft.days = value
 
+        // Durées uniquement
         case .weeks:
-            rhsIntent = .duration
             rhsDurationDraft.weeks = value
 
         case .hours:
-            rhsIntent = .duration
             rhsDurationDraft.hours = value
 
         case .minutes:
-            rhsIntent = .duration
             rhsDurationDraft.minutes = value
 
         case .seconds:
-            rhsIntent = .duration
             rhsDurationDraft.seconds = value
         }
+
+        // Intent (utile pour UI / debug / RN)
+        if rhsDateDraft.year != nil || rhsDateDraft.month != nil || rhsDateDraft.day != nil {
+            rhsIntent = .date
+        } else {
+            rhsIntent = .duration
+        }
     }
+
+
 
     // MARK: - Commit entry (buffer OR drafts) -> lhs/rhs
     private func commitEntryIfNeeded(targetIsRHS: Bool) throws {
 
-        // 1️⃣ Buffer clavier (nombres, dates JJ/MM/AAAA, hh:mm:ss, etc.)
+        // -------------------------------------------------
+        // 1️⃣ Buffer texte (nombre, date dd/mm/yyyy, heure)
+        // -------------------------------------------------
         if !buffer.isEmpty {
             let v = try parser.parse(buffer)
             assign(v, toRHS: targetIsRHS)
@@ -444,17 +488,71 @@ final class CalculatorViewModel: ObservableObject {
             return
         }
 
-        // 2️⃣ Date composée par unités (Y/M/D)
+        // -------------------------------------------------
+        // 2️⃣ Date composée (Y/M/D explicite)
+        // -------------------------------------------------
         let dateDraft = targetIsRHS ? rhsDateDraft : lhsDateDraft
         if let d = makeDate(from: dateDraft) {
-            let v: TDValue = .date(d)
-            assign(v, toRHS: targetIsRHS)   // assign() met déjà le weekday
-            if targetIsRHS { rhsDateDraft = DateComponents() } else { lhsDateDraft = DateComponents() }
+
+            // =================================================
+            // 🔒 RÈGLES PRO PREMIUM
+            // =================================================
+
+            // ❌ Interdit : Date + Date
+            if targetIsRHS,
+               let lhs,
+               case .date = lhs,
+               op == .add {
+                throw CalcError.invalidOperation
+            }
+
+            // ✅ Cas clé : Date1 - Date2
+            // RHS est une vraie date UNIQUEMENT si elle est
+            // >= début du calendrier grégorien
+            if targetIsRHS,
+               let lhs,
+               case .date = lhs,
+               op == .sub {
+
+                if isValidGregorianDate(d) {
+                    // Date1 - Date2 → quantité (engine s’en charge)
+                    let v: TDValue = .date(d)
+                    assign(v, toRHS: true)
+                    resetDrafts(isRHS: true)
+                    return
+                } else {
+                    // ❌ Date trop ancienne → on BASCULE en quantité
+                    // on ne commit PAS la date
+                }
+            } else {
+                // Cas normal (LHS ou autre)
+                let v: TDValue = .date(d)
+                assign(v, toRHS: targetIsRHS)
+                resetDrafts(isRHS: targetIsRHS)
+                return
+            }
+        }
+
+
+
+        // -------------------------------------------------
+        // 3️⃣ Quantité / Durée (unités)
+        // -------------------------------------------------
+        let durDraft = targetIsRHS ? rhsDurationDraft : lhsDurationDraft
+
+        // 🔑 CAS CLÉ : RHS + LHS = Date → Calendar Quantity
+        if targetIsRHS,
+           let lhs,
+           case .date = lhs,
+           let cal = calendarQuantityFromDraft(durDraft) {
+
+            let v: TDValue = .calendar(cal)
+            assign(v, toRHS: true)
+            resetDrafts(isRHS: true)
             return
         }
 
-        // 2️⃣bis Durée composée par unités (Weeks/Days/Hours/Minutes/Seconds, etc.)
-        let durDraft = targetIsRHS ? rhsDurationDraft : lhsDurationDraft
+        // 🔹 SINON → Durée horaire
         if let dur = durationFromDraft(durDraft) {
             let v: TDValue = .duration(dur)
             assign(v, toRHS: targetIsRHS)
@@ -462,11 +560,15 @@ final class CalculatorViewModel: ObservableObject {
             return
         }
 
-        // 3️⃣ Rien à commit → erreur
+        // -------------------------------------------------
+        // 4️⃣ Rien à commit → Error
+        // -------------------------------------------------
         throw CalcError.invalidOperation
     }
 
+    // ==================================================
     // MARK: - Duration helpers (EXPERT)
+    // =================================================
 
     // Convert a duration draft into a canonical duration (seconds-based)
     private func durationFromDraft(_ d: DurationDraft) -> TDDuration? {
@@ -484,6 +586,18 @@ final class CalculatorViewModel: ObservableObject {
         return TDDuration(seconds: totalSeconds)
     }
 
+    private func calendarQuantityFromDraft(_ d: DurationDraft) -> TDCalendarQuantity? {
+        if d.years == 0 && d.months == 0 && d.weeks == 0 && d.days == 0 {
+            return nil
+        }
+        return TDCalendarQuantity(
+            years: d.years,
+            months: d.months,
+            weeks: d.weeks,
+            days: d.days
+        )
+    }
+    
     // Reset drafts after commit
     private func resetDrafts(isRHS: Bool) {
         if isRHS {
@@ -524,6 +638,11 @@ final class CalculatorViewModel: ObservableObject {
         return options.calendar.date(from: c).map { options.calendar.startOfDay(for: $0) }
     }
 
+    // MARK: - Gregorian helpers (PRO)
+    private func isValidGregorianDate(_ date: Date) -> Bool {
+        date >= options.gregorianStart
+    }
+    
     // MARK: - Display
     private func updateDisplayFromState() {
         if !buffer.isEmpty {
@@ -538,41 +657,48 @@ final class CalculatorViewModel: ObservableObject {
     }
 
     private func updateDateTimeDraftDisplay(isRHS: Bool) {
-        // Draft display: show what user is composing, without building a Date too early.
         let dc = isRHS ? rhsDateDraft : lhsDateDraft
 
-        var parts: [String] = []
-        if let d = dc.day { parts.append("\(d) Days") }
-        if let m = dc.month { parts.append("\(m) Months") }
-        if let y = dc.year { parts.append("\(y) Years") }
+        // 1) Draft date (Y/M/D seulement)
+        var dateParts: [String] = []
+        if let d = dc.day   { dateParts.append("\(d) Days") }
+        if let m = dc.month { dateParts.append("\(m) Months") }
+        if let y = dc.year  { dateParts.append("\(y) Years") }
 
-        if parts.isEmpty {
-            // duration draft?
-            let dur = isRHS ? rhsDurationDraft : lhsDurationDraft
-            if !dur.isEmpty {
-                var p: [String] = []
-                if dur.years != 0 { p.append("\(dur.years) Years") }
-                if dur.months != 0 { p.append("\(dur.months) Months") }
-                if dur.weeks != 0 { p.append("\(dur.weeks) Weeks") }
-                if dur.days != 0 { p.append("\(dur.days) Days") }
-                if dur.hours != 0 { p.append("\(dur.hours) Hours") }
-                if dur.minutes != 0 { p.append("\(dur.minutes) Minutes") }
-                if dur.seconds != 0 { p.append("\(dur.seconds) Seconds") }
-                
-                displayResult = TDDisplayResult(main: parts.joined(separator: " "), secondary: nil)
-                
-                // ✅ Ne pas écraser le weekday si une Date a déjà été construite (LHS ou RHS)
-                if let current = isRHS ? rhs : lhs {
-                    setWeekdayIfDate(current)
-                } else {
-                    weekday = nil
-                }
-            }
+        if !dateParts.isEmpty {
+            displayResult = TDDisplayResult(main: dateParts.joined(separator: " "), secondary: nil)
+            weekday = nil
+            return
         }
 
-        displayResult = TDDisplayResult(main: parts.joined(separator: " "), secondary: nil)
+        // 2) Draft duration / calendar quantity
+        let dur = isRHS ? rhsDurationDraft : lhsDurationDraft
+        if !dur.isEmpty {
+            var p: [String] = []
+            if dur.years != 0    { p.append("\(dur.years) Years") }
+            if dur.months != 0   { p.append("\(dur.months) Months") }
+            if dur.weeks != 0    { p.append("\(dur.weeks) Weeks") }
+            if dur.days != 0     { p.append("\(dur.days) Days") }
+            if dur.hours != 0    { p.append("\(dur.hours) Hours") }
+            if dur.minutes != 0  { p.append("\(dur.minutes) Minutes") }
+            if dur.seconds != 0  { p.append("\(dur.seconds) Seconds") }
+
+            displayResult = TDDisplayResult(main: p.joined(separator: " "), secondary: nil)
+
+            // Ne change pas le weekday si une Date est déjà commit ailleurs
+            if let current = isRHS ? rhs : lhs {
+                setWeekdayIfDate(current)
+            } else {
+                weekday = nil
+            }
+            return
+        }
+
+        // 3) Rien
+        displayResult = TDDisplayResult(main: "0", secondary: nil)
         weekday = nil
     }
+
 
     // MARK: - Weekday helpers
     private func weekdayIndex(from date: Date) -> Int {
@@ -587,4 +713,22 @@ final class CalculatorViewModel: ObservableObject {
             weekday = nil
         }
     }
+    
+    private enum FirstValueKind {
+        case none
+        case number
+        case date
+        case duration
+    }
+
+    private var firstValueKind: FirstValueKind {
+        guard let lhs else { return .none }
+        switch lhs {
+        case .number: return .number
+        case .date: return .date
+        case .duration, .calendar: return .duration
+        }
+    }
+
+    
 }

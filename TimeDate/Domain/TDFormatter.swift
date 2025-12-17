@@ -30,6 +30,12 @@ struct TDFormatter {
                 main: formatDate(date),
                 secondary: nil
             )
+            
+        case .calendar(let q):   // ✅ NOUVEAU
+                return TDDisplayResult(
+                    main: formatCalendarQuantity(q),
+                    secondary: nil
+                )
         }
     }
 
@@ -100,4 +106,24 @@ struct TDFormatter {
         return parts.joined(separator: " ")
     }
     
+    // Quantité Calendar
+    private func formatCalendarQuantity(_ q: TDCalendarQuantity) -> String {
+        var parts: [String] = []
+
+        if q.years != 0 {
+            parts.append("\(q.years) \(q.years == 1 ? "Year" : "Years")")
+        }
+        if q.months != 0 {
+            parts.append("\(q.months) \(q.months == 1 ? "Month" : "Months")")
+        }
+        if q.weeks != 0 {
+            parts.append("\(q.weeks) \(q.weeks == 1 ? "Week" : "Weeks")")
+        }
+        if q.days != 0 {
+            parts.append("\(q.days) \(q.days == 1 ? "Day" : "Days")")
+        }
+
+        return parts.isEmpty ? "0 Days" : parts.joined(separator: " ")
+    }
+
 }

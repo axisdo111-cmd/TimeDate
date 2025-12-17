@@ -48,4 +48,22 @@ struct TDDuration: Equatable {
         comps.second = seconds
         return comps
     }
+    
+    // temps Pur Seconds
+    enum TDDurationKind {
+        case time          // secondes pures (hh:mm:ss)
+        case calendar      // Y / M / W / D
+    }
+
+    struct TDDuration {
+        let kind: TDDurationKind
+        let seconds: Int              // pour time
+        let years: Int
+        let months: Int
+        let weeks: Int
+        let days: Int
+        
+    }
 }
+
+

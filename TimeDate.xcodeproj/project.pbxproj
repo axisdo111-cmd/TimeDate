@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9607F7F72EF19CF20052427E /* TDCalendarQuantity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9607F7F62EF19CF20052427E /* TDCalendarQuantity.swift */; };
+		961352952EF1C19800C89E1E /* TDInputAccumulator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 961352942EF1C19800C89E1E /* TDInputAccumulator.swift */; };
 		962FE2F12EEC3BE00039826D /* TimeDateApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 962FE2F02EEC3BE00039826D /* TimeDateApp.swift */; };
 		962FE2F32EEC3BE00039826D /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 962FE2F22EEC3BE00039826D /* ContentView.swift */; };
 		962FE2F52EEC3BE20039826D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 962FE2F42EEC3BE20039826D /* Assets.xcassets */; };
@@ -31,6 +33,7 @@
 		9641B4FD2EECC7F900CC67E1 /* TDDuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9641B4FC2EECC7F900CC67E1 /* TDDuration.swift */; };
 		9641B4FF2EECCC9E00CC67E1 /* CalcError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9641B4FE2EECCC9E00CC67E1 /* CalcError.swift */; };
 		9641B5012EECD60200CC67E1 /* TDDisplayResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9641B5002EECD60200CC67E1 /* TDDisplayResult.swift */; };
+		9670D0562EF217BD001D15DD /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9670D0552EF217BD001D15DD /* AppDelegate.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -51,6 +54,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		9607F7F62EF19CF20052427E /* TDCalendarQuantity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TDCalendarQuantity.swift; sourceTree = "<group>"; };
+		961352942EF1C19800C89E1E /* TDInputAccumulator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TDInputAccumulator.swift; sourceTree = "<group>"; };
 		962FE2ED2EEC3BE00039826D /* TimeDate.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TimeDate.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		962FE2F02EEC3BE00039826D /* TimeDateApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeDateApp.swift; sourceTree = "<group>"; };
 		962FE2F22EEC3BE00039826D /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -78,6 +83,7 @@
 		9641B4FC2EECC7F900CC67E1 /* TDDuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TDDuration.swift; sourceTree = "<group>"; };
 		9641B4FE2EECCC9E00CC67E1 /* CalcError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalcError.swift; sourceTree = "<group>"; };
 		9641B5002EECD60200CC67E1 /* TDDisplayResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TDDisplayResult.swift; sourceTree = "<group>"; };
+		9670D0552EF217BD001D15DD /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -173,6 +179,7 @@
 				962FE3332EEC6E9A0039826D /* TDDisplayCard.swift */,
 				962FE3352EEC6EB40039826D /* TDButtonStyle.swift */,
 				9641B5002EECD60200CC67E1 /* TDDisplayResult.swift */,
+				9670D0552EF217BD001D15DD /* AppDelegate.swift */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -198,6 +205,8 @@
 				9641B4FA2EECC45C00CC67E1 /* TDFormatter.swift */,
 				9641B4FC2EECC7F900CC67E1 /* TDDuration.swift */,
 				9641B4FE2EECCC9E00CC67E1 /* CalcError.swift */,
+				9607F7F62EF19CF20052427E /* TDCalendarQuantity.swift */,
+				961352942EF1C19800C89E1E /* TDInputAccumulator.swift */,
 			);
 			path = Domain;
 			sourceTree = "<group>";
@@ -332,6 +341,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9670D0562EF217BD001D15DD /* AppDelegate.swift in Sources */,
 				962FE3342EEC6E9A0039826D /* TDDisplayCard.swift in Sources */,
 				962FE32C2EEC65830039826D /* TDParser.swift in Sources */,
 				962FE3202EEC64F50039826D /* KeypadView.swift in Sources */,
@@ -347,7 +357,9 @@
 				9641B5012EECD60200CC67E1 /* TDDisplayResult.swift in Sources */,
 				962FE3322EEC6E3C0039826D /* TDMode.swift in Sources */,
 				962FE2F12EEC3BE00039826D /* TimeDateApp.swift in Sources */,
+				961352952EF1C19800C89E1E /* TDInputAccumulator.swift in Sources */,
 				9641B4FB2EECC45C00CC67E1 /* TDFormatter.swift in Sources */,
+				9607F7F72EF19CF20052427E /* TDCalendarQuantity.swift in Sources */,
 				962FE3382EEC6ED40039826D /* TDOptions.swift in Sources */,
 				962FE3282EEC65550039826D /* TDOperator.swift in Sources */,
 				962FE33A2EEC71EE0039826D /* UnitKind.swift in Sources */,

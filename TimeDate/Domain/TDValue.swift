@@ -9,6 +9,7 @@ import Foundation
 
 enum TDValue: Equatable {
     case number(Decimal)
-    case duration(TDDuration)
+    case duration(TDDuration)           // Temps Pur
     case date(Date)
+    case calendar(TDCalendarQuantity)   // Quantité Calendaire
 }

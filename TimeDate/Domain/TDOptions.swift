@@ -23,4 +23,13 @@ struct TDOptions {
         cal.timeZone = fixedTimeZone
         return cal
     }
+    
+    let gregorianStart: Date = {
+        var c = DateComponents()
+        c.year = 1582
+        c.month = 10
+        c.day = 15
+        return Calendar(identifier: .gregorian).date(from: c)!
+    }()
+
 }

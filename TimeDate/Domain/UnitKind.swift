@@ -37,4 +37,37 @@ enum UnitKind: CaseIterable {
              return false
          }
      }
+    
+    enum UnitCategory {
+        case calendar    // années, mois
+        case dayBased    // semaines, jours
+        case time        // h, m, s
+    }
+    
+    var category: UnitCategory {
+        switch self {
+        case .years, .months:
+            return .calendar
+        case .weeks, .days:
+            return .dayBased
+        case .hours, .minutes, .seconds:
+            return .time
+        }
+    }
+    
+    /// Always calendar-dependent
+    var isStrictCalendarUnit: Bool {
+        category == .calendar || category == .dayBased
+    }
+    
+    /// Calendar-dependent depending on context (Date vs Duration)
+    var isCalendarUnit: Bool {
+        category == .calendar || category == .dayBased
+    }
+
+    var isTimeUnit: Bool {
+        category == .time
+    }
+
+    
 }

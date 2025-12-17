@@ -26,6 +26,14 @@ struct TDCalcEngine {
             guard y != 0 else { throw CalcError.invalidOperation }
             return .number(x / y)
 
+        // MARK: - Date − Calendar
+        // Date ± Calendar Quantity
+        case let (.date(date), .add, .calendar(q)):
+            return .date(apply(q, to: date))
+
+        case let (.date(date), .sub, .calendar(q)):
+            return .date(apply(q.negated(), to: date))
+            
         // MARK: - Date − Date
         case let (.date(d1), .sub, .date(d2)):
             let cal = options.calendar
@@ -59,4 +67,26 @@ struct TDCalcEngine {
             throw CalcError.invalidOperation
         }
     }
+    
+    private func apply(_ q: TDCalendarQuantity, to date: Date) -> Date {
+        let cal = options.calendar
+        var result = date
+
+        if q.years != 0 {
+            result = cal.date(byAdding: .year, value: q.years, to: result)!
+        }
+        if q.months != 0 {
+            result = cal.date(byAdding: .month, value: q.months, to: result)!
+        }
+        if q.weeks != 0 {
+            result = cal.date(byAdding: .day, value: q.weeks * 7, to: result)!
+        }
+        if q.days != 0 {
+            result = cal.date(byAdding: .day, value: q.days, to: result)!
+        }
+
+        return result
+    }
+
 }
+
