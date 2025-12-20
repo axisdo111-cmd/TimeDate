@@ -15,21 +15,29 @@ struct TDLayout {
     let topPadding: CGFloat
     let bottomPadding: CGFloat
     let showWeekdayBarFR: Bool
- 
+    // Ipad
+    let keyWidthMultiplier: CGFloat
+         
     init(geo: GeometryProxy) {
+        let w = geo.size.width
         let h = geo.size.height
 
-        // iPhone SE (2e/3e gen) ~ 667pt, SE 1st gen ~ 568pt
-        self.isSmallPhone = h <= 700
+        // Classes d'appareils
+        let isSE = h <= 700
+        let isIPad = w >= 700   // 👈 clé du problème
 
-        self.vSpacing = isSmallPhone ? 12 : 18
-        self.displayHeight = isSmallPhone ? 115 : 135
-        self.topPadding = isSmallPhone ? 6 : 10
-        // Réduction du bas automatiquement selon SE ou Pro Max
-        self.bottomPadding = isSmallPhone ? 8 : 18
+        self.isSmallPhone = isSE
 
+        // 🎹 Largeur des touches
+        self.keyWidthMultiplier = isIPad ? 2.0 : 1.0
 
-        // ✅ on retire la WeekdayBarView sur petits écrans
-        self.showWeekdayBarFR = !isSmallPhone
+        // Spacing & display
+        self.vSpacing = isSE ? 12 : 18
+        self.displayHeight = isSE ? 115 : 135
+        self.topPadding = isSE ? 6 : 10
+        self.bottomPadding = isSE ? 8 : 18
+
+        // Weekday FR uniquement sur écrans confortables
+        self.showWeekdayBarFR = !isSE
     }
 }

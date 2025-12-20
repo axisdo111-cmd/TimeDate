@@ -10,6 +10,7 @@ import Foundation
 struct TDFormatter {
 
     let options: TDOptions
+    private let locale = Locale(identifier: "fr_FR")
 
     // MARK: - Public API
 
@@ -43,8 +44,9 @@ struct TDFormatter {
 
     private func formatDate(_ date: Date) -> String {
         let f = DateFormatter()
-        f.locale = options.locale
+        f.locale = options.calendar.locale ?? Locale.current
         f.calendar = options.calendar
+        f.locale = options.calendar.locale ?? Locale.current
         f.timeZone = .current
         f.dateFormat = "dd/MM/yyyy"
         return f.string(from: date)
@@ -60,7 +62,7 @@ struct TDFormatter {
         }
 
         let nf = NumberFormatter()
-        nf.locale = options.locale
+        nf.locale = options.calendar.locale ?? Locale.current
         nf.numberStyle = .decimal
         nf.maximumFractionDigits = 12
         nf.usesGroupingSeparator = false
@@ -100,7 +102,7 @@ struct TDFormatter {
         let timePart = String(format: "%02d:%02d:%02d", hours, minutes, secs)
 
         if timePart != "00:00:00" {
-            parts.append("- \(timePart)")
+            parts.append(timePart)   // ✅ PLUS DE "-"
         }
 
         return parts.joined(separator: " ")

@@ -11,12 +11,12 @@ import Foundation
 
 /// Canonical duration type.
 /// - Internal storage: seconds only
-/// - No Calendar
+/// - Always >= 0
+/// - No calendar logic
 /// - No UI logic
-/// - No approximation
 struct TDDuration: Equatable {
 
-    /// Canonical storage (>= 0)
+    /// Canonical storage (seconds ≥ 0)
     let seconds: Int
 
     // MARK: - Init
@@ -25,10 +25,10 @@ struct TDDuration: Equatable {
         self.seconds = max(0, seconds)
     }
 
-    // MARK: - Decomposition (low-level, math only)
+    // MARK: - Decomposition (math only)
 
     /// Decompose seconds into days / hours / minutes / seconds
-    /// (Used by formatter)
+    /// (used by formatter only)
     func components() -> DateComponents {
         var remaining = seconds
 
@@ -48,22 +48,4 @@ struct TDDuration: Equatable {
         comps.second = seconds
         return comps
     }
-    
-    // temps Pur Seconds
-    enum TDDurationKind {
-        case time          // secondes pures (hh:mm:ss)
-        case calendar      // Y / M / W / D
-    }
-
-    struct TDDuration {
-        let kind: TDDurationKind
-        let seconds: Int              // pour time
-        let years: Int
-        let months: Int
-        let weeks: Int
-        let days: Int
-        
-    }
 }
-
-

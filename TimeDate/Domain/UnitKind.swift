@@ -18,13 +18,13 @@ enum UnitKind: CaseIterable {
 
     var title: String {
         switch self {
-        case .years: return "Années"
-        case .months: return "Mois"
-        case .weeks: return "Semaines"
-        case .days: return "Jours"
-        case .hours: return "Heures"
+        case .years: return "Years"
+        case .months: return "Months"
+        case .weeks: return "Weeks"
+        case .days: return "Days"
+        case .hours: return "Hours"
         case .minutes: return "Minutes"
-        case .seconds: return "Secondes"
+        case .seconds: return "Seconds"
         }
     }
 

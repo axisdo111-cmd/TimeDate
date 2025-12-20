@@ -6,3 +6,8 @@
 //
 
 import Foundation
+
+@MainActor
+final class TDOptionsStore: ObservableObject {
+    @Published var inclusiveDiff: Bool = false
+}

@@ -62,6 +62,27 @@ struct TDCalcEngine {
 
         case let (.duration(a), .sub, .duration(b)):
             return .duration(TDDuration(seconds: abs(a.seconds - b.seconds)))
+            
+        // MARK: - Duration × Number
+        case let (.duration(d), .mul, .number(n)):
+            let value = NSDecimalNumber(decimal: Decimal(d.seconds) * n)
+                .rounding(accordingToBehavior: nil)
+                .intValue
+            return .duration(TDDuration(seconds: value))
+
+        case let (.number(n), .mul, .duration(d)):
+            let value = NSDecimalNumber(decimal: Decimal(d.seconds) * n)
+                .rounding(accordingToBehavior: nil)
+                .intValue
+            return .duration(TDDuration(seconds: value))
+
+        // MARK: - Duration ÷ Number
+        case let (.duration(d), .div, .number(n)):
+            guard n != 0 else { throw CalcError.invalidOperation }
+            let value = NSDecimalNumber(decimal: Decimal(d.seconds) / n)
+                .rounding(accordingToBehavior: nil)
+                .intValue
+            return .duration(TDDuration(seconds: value))
 
         default:
             throw CalcError.invalidOperation

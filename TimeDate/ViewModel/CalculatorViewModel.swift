@@ -18,6 +18,27 @@ final class CalculatorViewModel: ObservableObject {
     @Published var expression: String = ""
     @Published var weekday: Int? = nil
     @Published var didJustEvaluate: Bool = false
+    
+    // Inclusive
+    // MARK: - Options (SOURCE DE VÉRITÉ)
+    // MARK: - Options Store (SOURCE DE VÉRITÉ UI)
+    private let optionsStore = TDOptionsStore()
+
+    // MARK: - Options Snapshot (DOMAIN)
+    private var options: TDOptions {
+        TDOptions(
+            inclusiveDiff: optionsStore.inclusiveDiff,
+            calendar: {
+                var cal = Calendar(identifier: .gregorian)
+                cal.locale = Locale.current
+                cal.timeZone = TimeZone(secondsFromGMT: 0)!
+                return cal
+            }()
+        )
+    }
+
+    // Eviter les Crash
+    @Published var isError: Bool = false
 
     @Published var displayResult: TDDisplayResult =
         TDDisplayResult(main: "0", secondary: nil)
@@ -27,7 +48,17 @@ final class CalculatorViewModel: ObservableObject {
     private var lhs: TDValue? = nil
     private var rhs: TDValue? = nil
     private var op: TDOperator? = nil
+    
+    // AC/BackSpace au démarrage
+    private var shouldShowBackspace: Bool {
+        !buffer.isEmpty || rhs != nil
+    }
 
+    // AC/BackSpace alternancce
+    var acKeyLabel: String {
+        shouldShowBackspace ? "←" : "AC"
+    }
+    
     // CASIO repeat (numbers only)
     private var lastOp: TDOperator? = nil
     private var lastRhs: TDValue? = nil
@@ -59,11 +90,16 @@ final class CalculatorViewModel: ObservableObject {
     private var rhsDurationDraft = DurationDraft()
     private var lhsDurationDraft = DurationDraft()
 
-    // Helpers
-    private var options = TDOptions()
-    private var parser: TDParser { TDParser(options: options) }
-    private var engine: TDCalcEngine { TDCalcEngine(options: options) }
-    private var formatter: TDFormatter { TDFormatter(options: options) }
+    // MARK: - Helpers (Options-aware)
+    private var parser: TDParser {
+        TDParser(options: options)
+    }
+    private var engine: TDCalcEngine {
+        TDCalcEngine(options: options)
+    }
+    private var formatter: TDFormatter {
+        TDFormatter(options: options)
+    }
 
     // MARK: - Mode / options
     func toggleMode() {
@@ -71,19 +107,30 @@ final class CalculatorViewModel: ObservableObject {
         clear(keepMode: true, keepInclusive: true)
     }
 
+    // Inclusive
     func setInclusiveDiff(_ on: Bool) {
         inclusiveDiff = on
-        options.inclusiveDiff = on
+        optionsStore.inclusiveDiff = on
     }
 
     // MARK: - Digits
     func tapDigit(_ d: String) {
+        // Anti Crash
+        if isError {
+            restartCalculator()
+            return
+        }
         if didJustEvaluate { clear(keepMode: true, keepInclusive: true) }
         buffer.append(d)
         updateDisplayFromState()
     }
 
     func tapDot() {
+        // Anti Crash
+        if isError {
+            restartCalculator()
+            return
+        }
         if didJustEvaluate { clear(keepMode: true, keepInclusive: true) }
         guard !buffer.contains(".") else { return }
         buffer = buffer.isEmpty ? "0." : buffer + "."
@@ -125,6 +172,15 @@ final class CalculatorViewModel: ObservableObject {
     
     // MARK: - Units (EXPERT)
     func tapUnit(_ unit: UnitKind) {
+        // Anti Crash
+        if isError {
+            restartCalculator()
+            return
+        }
+        // DATE-TIME CALC
+        if mode != .dateTime {
+             mode = .dateTime
+         }
         // 🔒 Neutralisation CASIO
         if op != nil, firstValueKind == .date {
             // RHS après une date : interdit de créer une date absolue
@@ -133,7 +189,7 @@ final class CalculatorViewModel: ObservableObject {
                 // OK
             }
         }
-        mode = .dateTime
+   
         didJustEvaluate = false
         
         let v = Int(buffer) ?? 0
@@ -173,30 +229,44 @@ final class CalculatorViewModel: ObservableObject {
         }
     }
 
+    // MARK: - Operation rules (PRO Premium)
+    private func isOperationAllowed(_ op: TDOperator) -> Bool {
+
+        // Pas encore de LHS → toujours autorisé
+        guard let lhs else { return true }
+
+        switch lhs {
+
+        case .date:
+            // Date × ÷ interdit
+            return op == .add || op == .sub
+
+        case .duration, .calendar:
+            // Durée × ÷ OK (avec un nombre)
+            return true
+
+        case .number:
+            // Nombre → tout autorisé
+            return true
+        }
+    }
+    
     // MARK: - Operators
     func tapOp(_ newOp: TDOperator) {
-        // =================================================
-        // 🔒 0) NEUTRALISATION DES TOUCHES (AVANT TOUT)
-        // =================================================
-        if firstValueKind == .date {
-
-            // Date × ou ÷ interdit
-            if newOp == .mul || newOp == .div {
-                displayResult = TDDisplayResult(main: "Error", secondary: nil)
-                return
-            }
+        // Anti Crash
+        if isError {
+            restartCalculator()
+            return
         }
+        // 🔒 Règle métier centrale
+            guard isOperatorEnabled(newOp) else {
+               return   // bouton ignoré (UX propre)
+           }
 
         // =================================================
         // 1) Logique normale
         // =================================================
         do {
-            // DATE-TIME: only + and -
-            if mode == .dateTime, (newOp == .mul || newOp == .div) {
-                displayResult = TDDisplayResult(main: "Error", secondary: nil)
-                return
-            }
-
             // ✅ Si on avait tapé "=" juste avant : on continue à partir du résultat
             if didJustEvaluate {
                 didJustEvaluate = false
@@ -235,19 +305,83 @@ final class CalculatorViewModel: ObservableObject {
             rhsDateDraft = DateComponents()
             rhsDurationDraft.reset()
             buffer = ""
-
+            // ⚠️ NE PAS rafraîchir le display ici
             expression = formatter.displayResult(lhs ?? .number(0)).main + " \(newOp.rawValue)"
-            updateDisplayFromState()
 
         } catch {
-            displayResult = TDDisplayResult(main: "Error", secondary: nil)
+            enterErrorState()
             weekday = nil
         }
+    }
+    
+    // MARK: - BackSpace
+    func tapACorBack() {
+        if shouldShowBackspace {
+            tapBackspace()
+        } else {
+            clear(keepMode: true, keepInclusive: true)
+        }
+    }
+
+    // MARK: - Retour automatique vers CALC
+    private func resetAll() {
+        buffer = ""
+        lhsDateDraft = DateComponents()
+        rhsDateDraft = DateComponents()
+        // etc.
+
+        mode = .calc
+    }
+    
+    // MARK: - Pourcentage [%] ✅
+    func tapPercent() {
+        // % uniquement en mode CALC
+        guard mode == .calc else { return }
+
+        // Il faut une LHS + un opérateur
+        guard let lhs, let op else { return }
+
+        // 1️⃣ Récupérer la RHS numérique
+        let rhsNumber: Decimal
+
+        if !buffer.isEmpty {
+            rhsNumber = Decimal(string: buffer) ?? 0
+        } else if let rhs, case let .number(n) = rhs {
+            rhsNumber = n
+        } else {
+            return
+        }
+
+        // 2️⃣ Récupérer la LHS numérique
+        guard case let .number(lhsNumber) = lhs else { return }
+
+        // 3️⃣ Calcul du %
+        let percentValue: Decimal
+
+        switch op {
+        case .add, .sub:
+            percentValue = lhsNumber * rhsNumber / 100
+        case .mul, .div:
+            percentValue = rhsNumber / 100
+        }
+
+        // 4️⃣ Injecter le résultat comme nouvelle RHS
+        let v: TDValue = .number(percentValue)
+        rhs = v
+        buffer = ""
+
+        // 5️⃣ Affichage intermédiaire (comme CASIO)
+        displayResult = formatter.displayResult(v)
     }
 
     
     // MARK: - Equals ✅ PRO Premium (CASIO + Date safe)
     func tapEquals() {
+        // Anti Crash
+        if isError {
+            restartCalculator()
+            return
+        }
         do {
             // -------------------------------------------------
             // 0) CASIO repeat "=" : uniquement si on a une mémoire
@@ -324,36 +458,88 @@ final class CalculatorViewModel: ObservableObject {
             rhsDurationDraft.reset()
 
         } catch {
-            displayResult = TDDisplayResult(main: "Error", secondary: nil)
+            enterErrorState()
             weekday = nil
         }
     }
 
     
-    
-    // MARK: - Today
+    // MARK: - Today (FINAL PRO / PREMIUM)
     func tapToday() {
+        // Anti crash
+        if isError {
+            restartCalculator()
+            return
+        }
+
         mode = .dateTime
+
         let date = options.calendar.startOfDay(for: Date())
         let v: TDValue = .date(date)
 
+        // 🔑 Cas 1 : pas de LHS ou LHS non-date → TODAY force LHS
+        let lhsIsDate: Bool = {
+            guard let lhs else { return false }
+            if case .date = lhs { return true }
+            return false
+        }()
+
+        if lhs == nil || !lhsIsDate || didJustEvaluate {
+            // RESET TOTAL contrôlé
+            lhs = v
+            rhs = nil
+            op = nil
+            buffer = ""
+            expression = ""
+
+            didJustEvaluate = false
+
+            lhsDateDraft = DateComponents()
+            lhsDurationDraft.reset()
+            rhsDateDraft = DateComponents()
+            rhsDurationDraft.reset()
+            rhsIntent = .unknown
+
+            displayResult = formatter.displayResult(v)
+            weekday = weekdayIndex(from: date)
+            return
+        }
+
+        // 🔑 Cas 2 : LHS est une date + opérateur présent → TODAY en RHS
+        if op != nil {
+            rhs = v
+            buffer = ""
+
+            rhsIntent = .date
+            rhsDateDraft = DateComponents()
+            rhsDurationDraft.reset()
+
+            displayResult = formatter.displayResult(v)
+            weekday = weekdayIndex(from: date)
+
+            didJustEvaluate = false
+            return
+        }
+
+        // 🔑 Cas 3 (sécurité) : fallback → TODAY devient LHS
         lhs = v
         rhs = nil
         op = nil
         buffer = ""
         expression = ""
-        didJustEvaluate = true
 
         lhsDateDraft = DateComponents()
-        rhsDateDraft = DateComponents()
-        rhsIntent = .unknown
-        rhsDurationDraft.reset()
         lhsDurationDraft.reset()
+        rhsDateDraft = DateComponents()
+        rhsDurationDraft.reset()
+        rhsIntent = .unknown
 
         displayResult = formatter.displayResult(v)
         weekday = weekdayIndex(from: date)
+        didJustEvaluate = false
     }
 
+        
     // MARK: - Clear
     func clear() {
         clear(keepMode: true, keepInclusive: true)
@@ -363,7 +549,7 @@ final class CalculatorViewModel: ObservableObject {
         if !keepMode { mode = .calc }
         if !keepInclusive {
             inclusiveDiff = false
-            options.inclusiveDiff = false
+            optionsStore.inclusiveDiff = false
         }
 
         buffer = ""
@@ -533,8 +719,6 @@ final class CalculatorViewModel: ObservableObject {
             }
         }
 
-
-
         // -------------------------------------------------
         // 3️⃣ Quantité / Durée (unités)
         // -------------------------------------------------
@@ -619,12 +803,10 @@ final class CalculatorViewModel: ObservableObject {
             lhs = v
         }
 
+        updateModeFromValue(v)   // 👈 AJOUT
         displayResult = formatter.displayResult(v)
-
-        // ✅ PATCH CRITIQUE : synchro du jour de la semaine
         setWeekdayIfDate(v)
     }
-
 
     private func makeDate(from comps: DateComponents) -> Date? {
         guard let y = comps.year, let m = comps.month, let d = comps.day else { return nil }
@@ -635,12 +817,16 @@ final class CalculatorViewModel: ObservableObject {
         c.hour = 0
         c.minute = 0
         c.second = 0
-        return options.calendar.date(from: c).map { options.calendar.startOfDay(for: $0) }
+        let calendar = Calendar(identifier: .gregorian)
+        return calendar.date(from: c).map {
+            calendar.startOfDay(for: $0)
+        }
+
     }
 
     // MARK: - Gregorian helpers (PRO)
     private func isValidGregorianDate(_ date: Date) -> Bool {
-        date >= options.gregorianStart
+        date >= TDGregorianRules.startDate
     }
     
     // MARK: - Display
@@ -730,5 +916,72 @@ final class CalculatorViewModel: ObservableObject {
         }
     }
 
+    // MARK: - Auto mode detection
+    private func updateModeFromValue(_ v: TDValue) {
+        switch v {
+        case .number:
+            mode = .calc
+        case .date, .duration, .calendar:
+            mode = .dateTime
+        }
+    }
     
+    // MARK: - Key availability
+    // MARK: - Operation rules (PREMIUM)
+    func isOperatorEnabled(_ newOp: TDOperator) -> Bool {
+
+        guard let lhs else { return true }
+
+        switch lhs {
+
+        case .number:
+            return true
+
+        case .duration, .calendar:
+            // Durée / Quantité calendaire × ÷ nombre → OK
+            return true
+
+        case .date:
+            // ❌ Date × ÷ interdit
+            if newOp == .mul || newOp == .div {
+                return false
+            }
+
+            // ➕ Date + … (mais pas Date + Date)
+            if newOp == .add {
+                return rhsIntent != .date
+            }
+
+            // ➖ Date - Date ou Date - Durée → OK
+            if newOp == .sub {
+                return true
+            }
+
+            return false
+        }
+    }
+    
+    // MARK: - Error handling (PRO)
+    private func enterErrorState() {
+        displayResult = TDDisplayResult(main: "Error", secondary: nil)
+        weekday = nil
+        isError = true
+
+        // On fige l’état logique
+        buffer = ""
+        lhs = nil
+        rhs = nil
+        op = nil
+        rhsIntent = .unknown
+        rhsDateDraft = DateComponents()
+        rhsDurationDraft.reset()
+    }
+
+    // MARK: - Restart (Premium)
+    func restartCalculator() {
+        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+        isError = false
+        clear(keepMode: true, keepInclusive: true)
+    }
+
 }

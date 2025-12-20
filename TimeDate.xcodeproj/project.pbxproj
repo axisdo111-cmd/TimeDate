@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		9607F7F72EF19CF20052427E /* TDCalendarQuantity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9607F7F62EF19CF20052427E /* TDCalendarQuantity.swift */; };
+		9608116E2EF36BE4004A34ED /* LCDBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9608116D2EF36BE4004A34ED /* LCDBackground.swift */; };
 		961352952EF1C19800C89E1E /* TDInputAccumulator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 961352942EF1C19800C89E1E /* TDInputAccumulator.swift */; };
 		962FE2F12EEC3BE00039826D /* TimeDateApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 962FE2F02EEC3BE00039826D /* TimeDateApp.swift */; };
 		962FE2F32EEC3BE00039826D /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 962FE2F22EEC3BE00039826D /* ContentView.swift */; };
@@ -26,7 +27,7 @@
 		962FE32C2EEC65830039826D /* TDParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 962FE32B2EEC65830039826D /* TDParser.swift */; };
 		962FE3322EEC6E3C0039826D /* TDMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 962FE3312EEC6E3C0039826D /* TDMode.swift */; };
 		962FE3342EEC6E9A0039826D /* TDDisplayCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 962FE3332EEC6E9A0039826D /* TDDisplayCard.swift */; };
-		962FE3362EEC6EB40039826D /* TDButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 962FE3352EEC6EB40039826D /* TDButtonStyle.swift */; };
+		962FE3362EEC6EB40039826D /* TDKeyButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 962FE3352EEC6EB40039826D /* TDKeyButtonStyle.swift */; };
 		962FE3382EEC6ED40039826D /* TDOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 962FE3372EEC6ED40039826D /* TDOptions.swift */; };
 		962FE33A2EEC71EE0039826D /* UnitKind.swift in Sources */ = {isa = PBXBuildFile; fileRef = 962FE3392EEC71EE0039826D /* UnitKind.swift */; };
 		9641B4FB2EECC45C00CC67E1 /* TDFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9641B4FA2EECC45C00CC67E1 /* TDFormatter.swift */; };
@@ -34,6 +35,11 @@
 		9641B4FF2EECCC9E00CC67E1 /* CalcError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9641B4FE2EECCC9E00CC67E1 /* CalcError.swift */; };
 		9641B5012EECD60200CC67E1 /* TDDisplayResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9641B5002EECD60200CC67E1 /* TDDisplayResult.swift */; };
 		9670D0562EF217BD001D15DD /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9670D0552EF217BD001D15DD /* AppDelegate.swift */; };
+		967FDFA52EF5BBD60000FF1E /* TDLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 967FDFA42EF5BBD60000FF1E /* TDLayout.swift */; };
+		96CCC1072EF535D40062AC7C /* WeekdayDigitalENView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96CCC1062EF535D40062AC7C /* WeekdayDigitalENView.swift */; };
+		96CCC1092EF536640062AC7C /* LCDColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96CCC1082EF536640062AC7C /* LCDColors.swift */; };
+		96CCC10B2EF54B180062AC7C /* TDOptionsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96CCC10A2EF54B180062AC7C /* TDOptionsStore.swift */; };
+		96CCC10D2EF55C6E0062AC7C /* TDGregorianRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96CCC10C2EF55C6E0062AC7C /* TDGregorianRules.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -55,6 +61,7 @@
 
 /* Begin PBXFileReference section */
 		9607F7F62EF19CF20052427E /* TDCalendarQuantity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TDCalendarQuantity.swift; sourceTree = "<group>"; };
+		9608116D2EF36BE4004A34ED /* LCDBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LCDBackground.swift; sourceTree = "<group>"; };
 		961352942EF1C19800C89E1E /* TDInputAccumulator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TDInputAccumulator.swift; sourceTree = "<group>"; };
 		962FE2ED2EEC3BE00039826D /* TimeDate.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TimeDate.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		962FE2F02EEC3BE00039826D /* TimeDateApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeDateApp.swift; sourceTree = "<group>"; };
@@ -76,7 +83,7 @@
 		962FE32B2EEC65830039826D /* TDParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TDParser.swift; sourceTree = "<group>"; };
 		962FE3312EEC6E3C0039826D /* TDMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TDMode.swift; sourceTree = "<group>"; };
 		962FE3332EEC6E9A0039826D /* TDDisplayCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TDDisplayCard.swift; sourceTree = "<group>"; };
-		962FE3352EEC6EB40039826D /* TDButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TDButtonStyle.swift; sourceTree = "<group>"; };
+		962FE3352EEC6EB40039826D /* TDKeyButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TDKeyButtonStyle.swift; sourceTree = "<group>"; };
 		962FE3372EEC6ED40039826D /* TDOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TDOptions.swift; sourceTree = "<group>"; };
 		962FE3392EEC71EE0039826D /* UnitKind.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnitKind.swift; sourceTree = "<group>"; };
 		9641B4FA2EECC45C00CC67E1 /* TDFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TDFormatter.swift; sourceTree = "<group>"; };
@@ -84,6 +91,11 @@
 		9641B4FE2EECCC9E00CC67E1 /* CalcError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalcError.swift; sourceTree = "<group>"; };
 		9641B5002EECD60200CC67E1 /* TDDisplayResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TDDisplayResult.swift; sourceTree = "<group>"; };
 		9670D0552EF217BD001D15DD /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		967FDFA42EF5BBD60000FF1E /* TDLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TDLayout.swift; sourceTree = "<group>"; };
+		96CCC1062EF535D40062AC7C /* WeekdayDigitalENView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekdayDigitalENView.swift; sourceTree = "<group>"; };
+		96CCC1082EF536640062AC7C /* LCDColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LCDColors.swift; sourceTree = "<group>"; };
+		96CCC10A2EF54B180062AC7C /* TDOptionsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TDOptionsStore.swift; sourceTree = "<group>"; };
+		96CCC10C2EF55C6E0062AC7C /* TDGregorianRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TDGregorianRules.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -173,13 +185,17 @@
 		962FE31A2EEC64800039826D /* UI */ = {
 			isa = PBXGroup;
 			children = (
+				967FDFA42EF5BBD60000FF1E /* TDLayout.swift */,
 				962FE31D2EEC64D30039826D /* CalculatorView.swift */,
 				962FE31F2EEC64F50039826D /* KeypadView.swift */,
 				962FE3212EEC650B0039826D /* WeekdayBarView.swift */,
 				962FE3332EEC6E9A0039826D /* TDDisplayCard.swift */,
-				962FE3352EEC6EB40039826D /* TDButtonStyle.swift */,
+				962FE3352EEC6EB40039826D /* TDKeyButtonStyle.swift */,
 				9641B5002EECD60200CC67E1 /* TDDisplayResult.swift */,
 				9670D0552EF217BD001D15DD /* AppDelegate.swift */,
+				9608116D2EF36BE4004A34ED /* LCDBackground.swift */,
+				96CCC1062EF535D40062AC7C /* WeekdayDigitalENView.swift */,
+				96CCC1082EF536640062AC7C /* LCDColors.swift */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -207,6 +223,8 @@
 				9641B4FE2EECCC9E00CC67E1 /* CalcError.swift */,
 				9607F7F62EF19CF20052427E /* TDCalendarQuantity.swift */,
 				961352942EF1C19800C89E1E /* TDInputAccumulator.swift */,
+				96CCC10A2EF54B180062AC7C /* TDOptionsStore.swift */,
+				96CCC10C2EF55C6E0062AC7C /* TDGregorianRules.swift */,
 			);
 			path = Domain;
 			sourceTree = "<group>";
@@ -347,18 +365,24 @@
 				962FE3202EEC64F50039826D /* KeypadView.swift in Sources */,
 				9641B4FF2EECCC9E00CC67E1 /* CalcError.swift in Sources */,
 				962FE2F32EEC3BE00039826D /* ContentView.swift in Sources */,
+				96CCC10D2EF55C6E0062AC7C /* TDGregorianRules.swift in Sources */,
 				962FE31E2EEC64D30039826D /* CalculatorView.swift in Sources */,
 				962FE3262EEC653D0039826D /* TDValue.swift in Sources */,
 				9641B4FD2EECC7F900CC67E1 /* TDDuration.swift in Sources */,
-				962FE3362EEC6EB40039826D /* TDButtonStyle.swift in Sources */,
+				962FE3362EEC6EB40039826D /* TDKeyButtonStyle.swift in Sources */,
 				962FE3222EEC650B0039826D /* WeekdayBarView.swift in Sources */,
+				96CCC1072EF535D40062AC7C /* WeekdayDigitalENView.swift in Sources */,
 				962FE32A2EEC656B0039826D /* TDCalcEngine.swift in Sources */,
 				962FE3242EEC65220039826D /* CalculatorViewModel.swift in Sources */,
+				967FDFA52EF5BBD60000FF1E /* TDLayout.swift in Sources */,
+				96CCC10B2EF54B180062AC7C /* TDOptionsStore.swift in Sources */,
 				9641B5012EECD60200CC67E1 /* TDDisplayResult.swift in Sources */,
 				962FE3322EEC6E3C0039826D /* TDMode.swift in Sources */,
 				962FE2F12EEC3BE00039826D /* TimeDateApp.swift in Sources */,
 				961352952EF1C19800C89E1E /* TDInputAccumulator.swift in Sources */,
+				96CCC1092EF536640062AC7C /* LCDColors.swift in Sources */,
 				9641B4FB2EECC45C00CC67E1 /* TDFormatter.swift in Sources */,
+				9608116E2EF36BE4004A34ED /* LCDBackground.swift in Sources */,
 				9607F7F72EF19CF20052427E /* TDCalendarQuantity.swift in Sources */,
 				962FE3382EEC6ED40039826D /* TDOptions.swift in Sources */,
 				962FE3282EEC65550039826D /* TDOperator.swift in Sources */,

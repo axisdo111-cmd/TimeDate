@@ -97,7 +97,7 @@ struct TDParser {
         // (optionnel) garde-fous simples
         guard (0...59).contains(m), (0...59).contains(sec) else { throw ParseError.invalidTime }
 
-        let total = (h * 3600) + (m * 60) + sec
+        let total = abs(h * 3600) + (m * 60) + sec
         return .duration(TDDuration(seconds: total))
     }
 }

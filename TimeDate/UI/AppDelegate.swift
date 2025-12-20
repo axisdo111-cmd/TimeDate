@@ -8,7 +8,7 @@
 import SwiftUI
 
 class AppDelegate: NSObject, UIApplicationDelegate {
-
+    // Force la position Portrait
     func application(
         _ application: UIApplication,
         supportedInterfaceOrientationsFor window: UIWindow?

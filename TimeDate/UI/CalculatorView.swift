@@ -12,53 +12,68 @@ struct CalculatorView: View {
     @StateObject private var vm = CalculatorViewModel()
 
     var body: some View {
-        VStack(spacing: 18) {
+        GeometryReader { geo in
+            let layout = TDLayout(geo: geo)
 
-            // Header
-            HStack(spacing: 14) {
+            VStack(spacing: layout.vSpacing) {
 
-                Button { vm.toggleMode() } label: {
-                    Text(vm.mode == .calc ? "CALC" : "DATE-TIME")
-                        .frame(maxWidth: 140)
+                // Header
+                HStack(spacing: 14) {
+                    Button { vm.toggleMode() } label: {
+                        Text(vm.mode == .calc ? "CALC" : "DATE-TIME")
+                            .frame(width: 140, height: 44)
+                    }
+                    .buttonStyle(TDKeyButtonStyle(kind: .op))
+                    .background(Color.clear)
+
+                    Spacer()
+
+                    VStack(alignment: .trailing, spacing: 4) {
+                        Text("Différence inclusive")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+
+                        Toggle("", isOn: Binding(
+                            get: { vm.inclusiveDiff },
+                            set: { vm.setInclusiveDiff($0) }
+                        ))
+                        .labelsHidden()
+                    }
                 }
-                .buttonStyle(TDButtonStyle(primary: true))
 
-                Spacer()
-
-                VStack(alignment: .trailing, spacing: 4) {
-                    Text("Différence inclusive")
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
-
-                    Toggle("", isOn: Binding(
-                        get: { vm.inclusiveDiff },
-                        set: { vm.setInclusiveDiff($0) }
-                    ))
-                    .labelsHidden()
+                TDDisplayCard(
+                    mode: vm.mode,
+                    expression: vm.expression,
+                    result: vm.displayResult,
+                    didJustEvaluate: vm.didJustEvaluate,
+                    fixedHeight: layout.displayHeight   // 👈 on va ajouter ce param
+                )
+                .overlay(alignment: .topLeading) {
+                    WeekdayDigitalENView(activeWeekday: vm.weekday)
+                        .padding(.top, 14)
+                        .padding(.leading, 20)
+                        .allowsHitTesting(false)   // 🔑 OBLIGATOIRE
                 }
+
+                // ✅ FR seulement sur écrans OK
+                if layout.showWeekdayBarFR {
+                    WeekdayBarView(active: vm.weekday)
+                }
+
+                KeypadView(vm: vm, layout: layout)
+
+                Spacer(minLength: 0)
             }
-
-            TDDisplayCard(
-                mode: vm.mode,
-                expression: vm.expression,
-                result: vm.displayResult,
-                didJustEvaluate: vm.didJustEvaluate
+            .padding(.horizontal, 18)
+            // .padding(.bottom, 18) Pro Max
+            .padding(.top, layout.topPadding)
+            .padding(.bottom, layout.bottomPadding) // Variation SE Pro Max
+            .background(
+                Color(.systemGroupedBackground).ignoresSafeArea()
             )
-
-            WeekdayBarView(active: vm.weekday)
-
-            KeypadView(vm: vm)
-
-            Spacer(minLength: 0)
         }
-        .padding(.horizontal, 18)
-        .padding(.bottom, 18)
-        .padding(.top, 10) // descend sous l’îlot
-        .background(
-            Color(.systemGroupedBackground)
-                .ignoresSafeArea()
-        )
     }
+
 }
 
 #Preview {

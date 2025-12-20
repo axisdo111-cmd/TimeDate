@@ -24,7 +24,7 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "0FBA4BF1-9D58-4C50-B665-D4B2D5268053"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "TimeDate/Domain/TDCalcEngine.swift"
@@ -32,6 +32,85 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "26"
             endingLineNumber = "26"
+            landmarkName = "compute(_:_:_:)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "0FBA4BF1-9D58-4C50-B665-D4B2D5268053 - 3f057cf3ebcb3dc6"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "TimeDate.TDCalcEngine.compute(TimeDate.TDValue, TimeDate.TDOperator, TimeDate.TDValue) throws -&gt; TimeDate.TDValue"
+                  moduleName = "TimeDate"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/dragon2903/Documents/Projets/TimeDate/TimeDate/Domain/TDCalcEngine.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "26"
+                  endingLineNumber = "26"
+                  offsetFromSymbolStart = "4057">
+               </Location>
+               <Location
+                  uuid = "0FBA4BF1-9D58-4C50-B665-D4B2D5268053 - 3f057cf3ebcb3dc6"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "TimeDate.TDCalcEngine.compute(TimeDate.TDValue, TimeDate.TDOperator, TimeDate.TDValue) throws -&gt; TimeDate.TDValue"
+                  moduleName = "TimeDate"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/dragon2903/Documents/Projets/TimeDate/TimeDate/Domain/TDCalcEngine.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "26"
+                  endingLineNumber = "26"
+                  offsetFromSymbolStart = "3556">
+               </Location>
+               <Location
+                  uuid = "0FBA4BF1-9D58-4C50-B665-D4B2D5268053 - 3f057cf3ebcb3dc6"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "TimeDate.TDCalcEngine.compute(TimeDate.TDValue, TimeDate.TDOperator, TimeDate.TDValue) throws -&gt; TimeDate.TDValue"
+                  moduleName = "TimeDate"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/dragon2903/Documents/Projets/TimeDate/TimeDate/Domain/TDCalcEngine.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "26"
+                  endingLineNumber = "26"
+                  offsetFromSymbolStart = "4184">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "0D629CB1-D6BE-4D68-90EC-5B31AF8625D5"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "TimeDate/UI/LCDBackground.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "33"
+            endingLineNumber = "33"
+            landmarkName = "lcdGradient"
+            landmarkType = "24">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "656F6215-9352-40A8-9416-49BAD00320A0"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "TimeDate/Domain/TDCalcEngine.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "30"
+            endingLineNumber = "30"
             landmarkName = "compute(_:_:_:)"
             landmarkType = "7">
          </BreakpointContent>

@@ -9,18 +9,29 @@ import SwiftUI
 
 struct KeypadView: View {
     @ObservedObject var vm: CalculatorViewModel
+    let layout: TDLayout
 
     // MARK: - Layout
     private let spacing: CGFloat = 14
     private let keySize: CGFloat = 74     // iPhone 15 Pro Max friendly
+    // iPad
+    private var keyWidth: CGFloat {
+        74 * layout.keyWidthMultiplier
+    }
+    private let keyHeight: CGFloat = 74
+
     private let radius: CGFloat = 18
+
+    // Taille des boutons temporels
+    private let unitKeyHeight: CGFloat = 38  // ≈ 1/2 hauteur
+
 
     private var grid4: [GridItem] {
         Array(repeating: GridItem(.flexible(), spacing: spacing), count: 4)
     }
 
     var body: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: layout.vSpacing) {
 
             // ─────────────────────────────
             // Unités + Today (4 colonnes)
@@ -35,12 +46,17 @@ struct KeypadView: View {
                 unitKey(.minutes)
                 unitKey(.seconds)
 
-                Button("Today") { vm.tapToday() }
-                    .buttonStyle(.plain)
-                    .frame(maxWidth: .infinity, minHeight: 44)
-                    .background(Color.blue)
-                    .foregroundColor(.white)
-                    .clipShape(RoundedRectangle(cornerRadius: radius, style: .continuous))
+                Button {
+                    vm.tapToday()
+                } label: {
+                    Text("Today")
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.85)
+                        .fixedSize(horizontal: true, vertical: false)
+                        .frame(width: keyWidth, height: unitKeyHeight)
+                }
+                .buttonStyle(TDKeyButtonStyle(kind: .op))
+
             }
 
             // ─────────────────────────────
@@ -54,14 +70,20 @@ struct KeypadView: View {
             LazyVGrid(columns: grid4, spacing: spacing) {
 
                 // Row 1
-                squareKey("C", style: .danger) { vm.clear() }
+                acBackspaceKey()
                 squareKey("/", style: .secondary) { vm.tapSeparatorSlash() }
                 squareKey(":", style: .secondary) { vm.tapSeparatorColon() }
+                //squareKey("÷", style: .op) { vm.tapOp(.div) }
                 squareKey("÷", style: .op) { vm.tapOp(.div) }
-
+                    .disabled(!vm.isOperatorEnabled(.div))
+                    .opacity(vm.isOperatorEnabled(.div) ? 1 : 0.35)
+                
                 // Row 2
                 digit("7"); digit("8"); digit("9")
+                //squareKey("×", style: .op) { vm.tapOp(.mul) }
                 squareKey("×", style: .op) { vm.tapOp(.mul) }
+                    .disabled(!vm.isOperatorEnabled(.mul))
+                    .opacity(vm.isOperatorEnabled(.mul) ? 1 : 0.35)
 
                 // Row 3
                 digit("4"); digit("5"); digit("6")
@@ -74,7 +96,7 @@ struct KeypadView: View {
                 // Row 5 (IMPORTANT: ⌫ entre . et =)
                 digit("0")
                 squareKey(".", style: .secondary) { vm.tapDot() }
-                squareKey("⌫", style: .secondary) { vm.tapBackspace() }
+                squareKey("%", style: .secondary) { vm.tapPercent() }
                 squareKey("=", style: .equals) { vm.tapEquals() }
             }
         }
@@ -84,13 +106,37 @@ struct KeypadView: View {
 
     // MARK: - Unit keys (rectangles)
     private func unitKey(_ u: UnitKind) -> some View {
-        Button(u.title) { vm.tapUnit(u) }
-            .buttonStyle(.plain)
-            .frame(maxWidth: .infinity, minHeight: 44)
-            .background(Color(.secondarySystemBackground))
-            .foregroundColor(.blue)
-            .clipShape(RoundedRectangle(cornerRadius: radius, style: .continuous))
+        Button {
+            vm.tapUnit(u)
+        } label: {
+            Text(u.title)
+                .lineLimit(1)
+                .minimumScaleFactor(0.85)
+                .fixedSize(horizontal: true, vertical: false)
+                .frame(width: keyWidth, height: unitKeyHeight)
+        }
+        .buttonStyle(TDKeyButtonStyle(kind: .unit))
     }
+
+    // MARK: - AC / Backspace key
+    private func acBackspaceKey() -> some View {
+        Button {
+            vm.tapACorBack()
+        } label: {
+            ZStack {
+                if vm.acKeyLabel == "←" {
+                    Text("⌫")
+                        .font(.system(size: 28, weight: .semibold))
+                } else {
+                    Text("AC")
+                        .font(.system(size: 18, weight: .semibold))
+                }
+            }
+            .frame(width: keyWidth, height: keyHeight)
+        }
+        .buttonStyle(TDKeyButtonStyle(kind: .danger))
+    }
+
 
     // MARK: - Square calculator keys
     private enum SquareStyle { case secondary, op, equals, danger }
@@ -103,19 +149,17 @@ struct KeypadView: View {
         Button(action: action) {
             Text(title)
                 .font(.system(size: 26, weight: .semibold, design: .rounded))
-                .frame(width: keySize, height: keySize)
+                .frame(width: keyWidth, height: keyHeight)
                 .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
-        .background(background(style))
-        .foregroundColor(foreground(style))
-        .clipShape(RoundedRectangle(cornerRadius: radius, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: radius, style: .continuous)
-                .stroke(Color.white.opacity(0.06), lineWidth: 1)
-        )
+        .buttonStyle(buttonStyle(style))
+
     }
 
+    // ==============================
+    // HELPER
+    // ==============================
+    
     private func background(_ style: SquareStyle) -> Color {
         switch style {
         case .secondary: return Color(.secondarySystemBackground)
@@ -131,4 +175,14 @@ struct KeypadView: View {
         case .op, .equals, .danger: return .white
         }
     }
+    
+    private func buttonStyle(_ style: SquareStyle) -> TDKeyButtonStyle {
+        switch style {
+        case .secondary: return TDKeyButtonStyle(kind: .number)
+        case .op:        return TDKeyButtonStyle(kind: .op)
+        case .equals:    return TDKeyButtonStyle(kind: .equals)
+        case .danger:    return TDKeyButtonStyle(kind: .danger)
+        }
+    }
+
 }
