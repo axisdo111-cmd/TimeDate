@@ -20,7 +20,7 @@ struct CalculatorView: View {
                 // Header
                 HStack(spacing: 14) {
                     Button { vm.toggleMode() } label: {
-                        Text(vm.mode == .calc ? "CALC" : "DATE-TIME")
+                        Text(vm.mode == .calc ? "CALC" : "TIME-DATE")
                             .frame(width: 140, height: 44)
                     }
                     .buttonStyle(TDKeyButtonStyle(kind: .op))
