@@ -9,14 +9,15 @@ import SwiftUI
 
 @main
 struct TimeDateApp: App {
-    // Bloque la rotation paysage provisoirement
+
     @UIApplicationDelegateAdaptor(AppDelegate.self)
     var appDelegate
-    
+
     var body: some Scene {
         WindowGroup {
-            CalculatorView()
+            RootView()
         }
     }
 }
+
 

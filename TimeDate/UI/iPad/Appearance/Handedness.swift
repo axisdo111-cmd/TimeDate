@@ -6,3 +6,10 @@
 //
 
 import Foundation
+
+enum Handedness: String, CaseIterable, Identifiable {
+    case right = "Droitier"
+    case left  = "Gaucher"
+
+    var id: String { rawValue }
+}

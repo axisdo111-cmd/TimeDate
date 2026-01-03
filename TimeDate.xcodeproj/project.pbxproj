@@ -10,6 +10,24 @@
 		9607F7F72EF19CF20052427E /* TDCalendarQuantity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9607F7F62EF19CF20052427E /* TDCalendarQuantity.swift */; };
 		9608116E2EF36BE4004A34ED /* LCDBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9608116D2EF36BE4004A34ED /* LCDBackground.swift */; };
 		961352952EF1C19800C89E1E /* TDInputAccumulator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 961352942EF1C19800C89E1E /* TDInputAccumulator.swift */; };
+		96230B952EFECEAE000AAB7B /* CalculatorIpadLandscapeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96230B942EFECEAE000AAB7B /* CalculatorIpadLandscapeView.swift */; };
+		96230B972EFECECB000AAB7B /* MainScreenPlaceholder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96230B962EFECECB000AAB7B /* MainScreenPlaceholder.swift */; };
+		96230B9C2EFECFDF000AAB7B /* WorkDayConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96230B9B2EFECFDF000AAB7B /* WorkDayConfig.swift */; };
+		96230B9E2EFED14C000AAB7B /* XCTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96230B9D2EFED14C000AAB7B /* XCTest.swift */; };
+		96230BA02EFED186000AAB7B /* WorkEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96230B9F2EFED186000AAB7B /* WorkEngine.swift */; };
+		96230BA22EFED1F1000AAB7B /* WorkEngineTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96230BA12EFED1F1000AAB7B /* WorkEngineTest.swift */; };
+		96230BA42EFED23C000AAB7B /* WorkDayWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96230BA32EFED23C000AAB7B /* WorkDayWindow.swift */; };
+		96230BA62EFED376000AAB7B /* DualKeypadContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96230BA52EFED376000AAB7B /* DualKeypadContainer.swift */; };
+		96230BA82EFED41D000AAB7B /* BlackStandardFrame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96230BA72EFED41D000AAB7B /* BlackStandardFrame.swift */; };
+		96230BAA2EFED494000AAB7B /* CasioMetalFrame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96230BA92EFED494000AAB7B /* CasioMetalFrame.swift */; };
+		96230BAC2EFED4BC000AAB7B /* BrushedAluminumFrame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96230BAB2EFED4BC000AAB7B /* BrushedAluminumFrame.swift */; };
+		96230BAE2EFED4D8000AAB7B /* CustomPresetFrame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96230BAD2EFED4D8000AAB7B /* CustomPresetFrame.swift */; };
+		96230BB02EFED50E000AAB7B /* DeviceFramView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96230BAF2EFED50E000AAB7B /* DeviceFramView.swift */; };
+		96230BB22EFED530000AAB7B /* DarkProFrame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96230BB12EFED530000AAB7B /* DarkProFrame.swift */; };
+		96230BB42EFED61E000AAB7B /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96230BB32EFED61E000AAB7B /* RootView.swift */; };
+		96230BB62EFED645000AAB7B /* CentralDisplayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96230BB52EFED645000AAB7B /* CentralDisplayView.swift */; };
+		96230BC82EFEE42F000AAB7B /* WorkProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96230BC72EFEE42F000AAB7B /* WorkProfile.swift */; };
+		96230BCA2EFEEB7B000AAB7B /* ExtendKeypadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96230BC92EFEEB7B000AAB7B /* ExtendKeypadView.swift */; };
 		962FE2F12EEC3BE00039826D /* TimeDateApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 962FE2F02EEC3BE00039826D /* TimeDateApp.swift */; };
 		962FE2F32EEC3BE00039826D /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 962FE2F22EEC3BE00039826D /* ContentView.swift */; };
 		962FE2F52EEC3BE20039826D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 962FE2F42EEC3BE20039826D /* Assets.xcassets */; };
@@ -34,6 +52,11 @@
 		9641B4FD2EECC7F900CC67E1 /* TDDuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9641B4FC2EECC7F900CC67E1 /* TDDuration.swift */; };
 		9641B4FF2EECCC9E00CC67E1 /* CalcError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9641B4FE2EECCC9E00CC67E1 /* CalcError.swift */; };
 		9641B5012EECD60200CC67E1 /* TDDisplayResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9641B5002EECD60200CC67E1 /* TDDisplayResult.swift */; };
+		9651BEC42F003EDC00BD516E /* MainScreenIpadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9651BEC32F003EDC00BD516E /* MainScreenIpadView.swift */; };
+		9651BEC62F0052DE00BD516E /* TDKeypadLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9651BEC52F0052DE00BD516E /* TDKeypadLayout.swift */; };
+		9651BEC92F0056E100BD516E /* KeypadSizeClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9651BEC82F0056E100BD516E /* KeypadSizeClass.swift */; };
+		9651BECB2F0057BC00BD516E /* KeypadLayoutResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9651BECA2F0057BC00BD516E /* KeypadLayoutResolver.swift */; };
+		965BD13B2EFFEC7000967BAA /* Handedness.swift in Sources */ = {isa = PBXBuildFile; fileRef = 965BD13A2EFFEC7000967BAA /* Handedness.swift */; };
 		9670D0562EF217BD001D15DD /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9670D0552EF217BD001D15DD /* AppDelegate.swift */; };
 		967FDFA52EF5BBD60000FF1E /* TDLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 967FDFA42EF5BBD60000FF1E /* TDLayout.swift */; };
 		96CCC1072EF535D40062AC7C /* WeekdayDigitalENView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96CCC1062EF535D40062AC7C /* WeekdayDigitalENView.swift */; };
@@ -63,6 +86,24 @@
 		9607F7F62EF19CF20052427E /* TDCalendarQuantity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TDCalendarQuantity.swift; sourceTree = "<group>"; };
 		9608116D2EF36BE4004A34ED /* LCDBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LCDBackground.swift; sourceTree = "<group>"; };
 		961352942EF1C19800C89E1E /* TDInputAccumulator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TDInputAccumulator.swift; sourceTree = "<group>"; };
+		96230B942EFECEAE000AAB7B /* CalculatorIpadLandscapeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalculatorIpadLandscapeView.swift; sourceTree = "<group>"; };
+		96230B962EFECECB000AAB7B /* MainScreenPlaceholder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainScreenPlaceholder.swift; sourceTree = "<group>"; };
+		96230B9B2EFECFDF000AAB7B /* WorkDayConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkDayConfig.swift; sourceTree = "<group>"; };
+		96230B9D2EFED14C000AAB7B /* XCTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XCTest.swift; sourceTree = "<group>"; };
+		96230B9F2EFED186000AAB7B /* WorkEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkEngine.swift; sourceTree = "<group>"; };
+		96230BA12EFED1F1000AAB7B /* WorkEngineTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkEngineTest.swift; sourceTree = "<group>"; };
+		96230BA32EFED23C000AAB7B /* WorkDayWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkDayWindow.swift; sourceTree = "<group>"; };
+		96230BA52EFED376000AAB7B /* DualKeypadContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DualKeypadContainer.swift; sourceTree = "<group>"; };
+		96230BA72EFED41D000AAB7B /* BlackStandardFrame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlackStandardFrame.swift; sourceTree = "<group>"; };
+		96230BA92EFED494000AAB7B /* CasioMetalFrame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CasioMetalFrame.swift; sourceTree = "<group>"; };
+		96230BAB2EFED4BC000AAB7B /* BrushedAluminumFrame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrushedAluminumFrame.swift; sourceTree = "<group>"; };
+		96230BAD2EFED4D8000AAB7B /* CustomPresetFrame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomPresetFrame.swift; sourceTree = "<group>"; };
+		96230BAF2EFED50E000AAB7B /* DeviceFramView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceFramView.swift; sourceTree = "<group>"; };
+		96230BB12EFED530000AAB7B /* DarkProFrame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DarkProFrame.swift; sourceTree = "<group>"; };
+		96230BB32EFED61E000AAB7B /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		96230BB52EFED645000AAB7B /* CentralDisplayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CentralDisplayView.swift; sourceTree = "<group>"; };
+		96230BC72EFEE42F000AAB7B /* WorkProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkProfile.swift; sourceTree = "<group>"; };
+		96230BC92EFEEB7B000AAB7B /* ExtendKeypadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtendKeypadView.swift; sourceTree = "<group>"; };
 		962FE2ED2EEC3BE00039826D /* TimeDate.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TimeDate.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		962FE2F02EEC3BE00039826D /* TimeDateApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeDateApp.swift; sourceTree = "<group>"; };
 		962FE2F22EEC3BE00039826D /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -90,6 +131,11 @@
 		9641B4FC2EECC7F900CC67E1 /* TDDuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TDDuration.swift; sourceTree = "<group>"; };
 		9641B4FE2EECCC9E00CC67E1 /* CalcError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalcError.swift; sourceTree = "<group>"; };
 		9641B5002EECD60200CC67E1 /* TDDisplayResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TDDisplayResult.swift; sourceTree = "<group>"; };
+		9651BEC32F003EDC00BD516E /* MainScreenIpadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainScreenIpadView.swift; sourceTree = "<group>"; };
+		9651BEC52F0052DE00BD516E /* TDKeypadLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TDKeypadLayout.swift; sourceTree = "<group>"; };
+		9651BEC82F0056E100BD516E /* KeypadSizeClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeypadSizeClass.swift; sourceTree = "<group>"; };
+		9651BECA2F0057BC00BD516E /* KeypadLayoutResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeypadLayoutResolver.swift; sourceTree = "<group>"; };
+		965BD13A2EFFEC7000967BAA /* Handedness.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Handedness.swift; sourceTree = "<group>"; };
 		9670D0552EF217BD001D15DD /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		967FDFA42EF5BBD60000FF1E /* TDLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TDLayout.swift; sourceTree = "<group>"; };
 		96CCC1062EF535D40062AC7C /* WeekdayDigitalENView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekdayDigitalENView.swift; sourceTree = "<group>"; };
@@ -123,6 +169,66 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		96230B922EFECCA3000AAB7B /* iPad */ = {
+			isa = PBXGroup;
+			children = (
+				9651BEC72F0056C800BD516E /* Layout */,
+				96230B9A2EFECFA8000AAB7B /* Civil */,
+				96230B992EFECF6E000AAB7B /* Scientific */,
+				96230B982EFECF61000AAB7B /* Work */,
+				96230B932EFECD46000AAB7B /* Appearance */,
+				96230B942EFECEAE000AAB7B /* CalculatorIpadLandscapeView.swift */,
+				96230B962EFECECB000AAB7B /* MainScreenPlaceholder.swift */,
+				96230B9D2EFED14C000AAB7B /* XCTest.swift */,
+				96230BA52EFED376000AAB7B /* DualKeypadContainer.swift */,
+				96230BAF2EFED50E000AAB7B /* DeviceFramView.swift */,
+				96230BB32EFED61E000AAB7B /* RootView.swift */,
+				96230BB52EFED645000AAB7B /* CentralDisplayView.swift */,
+				96230BC92EFEEB7B000AAB7B /* ExtendKeypadView.swift */,
+				9651BEC32F003EDC00BD516E /* MainScreenIpadView.swift */,
+			);
+			path = iPad;
+			sourceTree = "<group>";
+		};
+		96230B932EFECD46000AAB7B /* Appearance */ = {
+			isa = PBXGroup;
+			children = (
+				96230BA72EFED41D000AAB7B /* BlackStandardFrame.swift */,
+				96230BA92EFED494000AAB7B /* CasioMetalFrame.swift */,
+				96230BAB2EFED4BC000AAB7B /* BrushedAluminumFrame.swift */,
+				96230BAD2EFED4D8000AAB7B /* CustomPresetFrame.swift */,
+				96230BB12EFED530000AAB7B /* DarkProFrame.swift */,
+				965BD13A2EFFEC7000967BAA /* Handedness.swift */,
+			);
+			path = Appearance;
+			sourceTree = "<group>";
+		};
+		96230B982EFECF61000AAB7B /* Work */ = {
+			isa = PBXGroup;
+			children = (
+				96230B9B2EFECFDF000AAB7B /* WorkDayConfig.swift */,
+				96230B9F2EFED186000AAB7B /* WorkEngine.swift */,
+				96230BA12EFED1F1000AAB7B /* WorkEngineTest.swift */,
+				96230BA32EFED23C000AAB7B /* WorkDayWindow.swift */,
+				96230BC72EFEE42F000AAB7B /* WorkProfile.swift */,
+			);
+			path = Work;
+			sourceTree = "<group>";
+		};
+		96230B992EFECF6E000AAB7B /* Scientific */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Scientific;
+			sourceTree = "<group>";
+		};
+		96230B9A2EFECFA8000AAB7B /* Civil */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Civil;
+			sourceTree = "<group>";
+		};
 		962FE2E42EEC3BE00039826D = {
 			isa = PBXGroup;
 			children = (
@@ -185,6 +291,7 @@
 		962FE31A2EEC64800039826D /* UI */ = {
 			isa = PBXGroup;
 			children = (
+				96230B922EFECCA3000AAB7B /* iPad */,
 				967FDFA42EF5BBD60000FF1E /* TDLayout.swift */,
 				962FE31D2EEC64D30039826D /* CalculatorView.swift */,
 				962FE31F2EEC64F50039826D /* KeypadView.swift */,
@@ -213,8 +320,8 @@
 			children = (
 				962FE3252EEC653D0039826D /* TDValue.swift */,
 				962FE3272EEC65550039826D /* TDOperator.swift */,
-				962FE3292EEC656B0039826D /* TDCalcEngine.swift */,
 				962FE32B2EEC65830039826D /* TDParser.swift */,
+				962FE3292EEC656B0039826D /* TDCalcEngine.swift */,
 				962FE3312EEC6E3C0039826D /* TDMode.swift */,
 				962FE3372EEC6ED40039826D /* TDOptions.swift */,
 				962FE3392EEC71EE0039826D /* UnitKind.swift */,
@@ -227,6 +334,16 @@
 				96CCC10C2EF55C6E0062AC7C /* TDGregorianRules.swift */,
 			);
 			path = Domain;
+			sourceTree = "<group>";
+		};
+		9651BEC72F0056C800BD516E /* Layout */ = {
+			isa = PBXGroup;
+			children = (
+				9651BEC52F0052DE00BD516E /* TDKeypadLayout.swift */,
+				9651BEC82F0056E100BD516E /* KeypadSizeClass.swift */,
+				9651BECA2F0057BC00BD516E /* KeypadLayoutResolver.swift */,
+			);
+			path = Layout;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -360,29 +477,52 @@
 			buildActionMask = 2147483647;
 			files = (
 				9670D0562EF217BD001D15DD /* AppDelegate.swift in Sources */,
+				9651BEC42F003EDC00BD516E /* MainScreenIpadView.swift in Sources */,
+				96230BC82EFEE42F000AAB7B /* WorkProfile.swift in Sources */,
+				9651BEC92F0056E100BD516E /* KeypadSizeClass.swift in Sources */,
 				962FE3342EEC6E9A0039826D /* TDDisplayCard.swift in Sources */,
+				96230B9E2EFED14C000AAB7B /* XCTest.swift in Sources */,
 				962FE32C2EEC65830039826D /* TDParser.swift in Sources */,
+				96230BA22EFED1F1000AAB7B /* WorkEngineTest.swift in Sources */,
 				962FE3202EEC64F50039826D /* KeypadView.swift in Sources */,
+				96230BAC2EFED4BC000AAB7B /* BrushedAluminumFrame.swift in Sources */,
+				96230BA02EFED186000AAB7B /* WorkEngine.swift in Sources */,
+				96230BAA2EFED494000AAB7B /* CasioMetalFrame.swift in Sources */,
+				96230B9C2EFECFDF000AAB7B /* WorkDayConfig.swift in Sources */,
 				9641B4FF2EECCC9E00CC67E1 /* CalcError.swift in Sources */,
+				96230BAE2EFED4D8000AAB7B /* CustomPresetFrame.swift in Sources */,
 				962FE2F32EEC3BE00039826D /* ContentView.swift in Sources */,
 				96CCC10D2EF55C6E0062AC7C /* TDGregorianRules.swift in Sources */,
 				962FE31E2EEC64D30039826D /* CalculatorView.swift in Sources */,
+				96230BB22EFED530000AAB7B /* DarkProFrame.swift in Sources */,
+				96230BB02EFED50E000AAB7B /* DeviceFramView.swift in Sources */,
 				962FE3262EEC653D0039826D /* TDValue.swift in Sources */,
 				9641B4FD2EECC7F900CC67E1 /* TDDuration.swift in Sources */,
 				962FE3362EEC6EB40039826D /* TDKeyButtonStyle.swift in Sources */,
 				962FE3222EEC650B0039826D /* WeekdayBarView.swift in Sources */,
+				96230BA82EFED41D000AAB7B /* BlackStandardFrame.swift in Sources */,
 				96CCC1072EF535D40062AC7C /* WeekdayDigitalENView.swift in Sources */,
+				965BD13B2EFFEC7000967BAA /* Handedness.swift in Sources */,
 				962FE32A2EEC656B0039826D /* TDCalcEngine.swift in Sources */,
 				962FE3242EEC65220039826D /* CalculatorViewModel.swift in Sources */,
 				967FDFA52EF5BBD60000FF1E /* TDLayout.swift in Sources */,
 				96CCC10B2EF54B180062AC7C /* TDOptionsStore.swift in Sources */,
+				96230B952EFECEAE000AAB7B /* CalculatorIpadLandscapeView.swift in Sources */,
+				96230B972EFECECB000AAB7B /* MainScreenPlaceholder.swift in Sources */,
+				9651BEC62F0052DE00BD516E /* TDKeypadLayout.swift in Sources */,
+				96230BB62EFED645000AAB7B /* CentralDisplayView.swift in Sources */,
 				9641B5012EECD60200CC67E1 /* TDDisplayResult.swift in Sources */,
+				96230BCA2EFEEB7B000AAB7B /* ExtendKeypadView.swift in Sources */,
 				962FE3322EEC6E3C0039826D /* TDMode.swift in Sources */,
+				96230BB42EFED61E000AAB7B /* RootView.swift in Sources */,
+				9651BECB2F0057BC00BD516E /* KeypadLayoutResolver.swift in Sources */,
 				962FE2F12EEC3BE00039826D /* TimeDateApp.swift in Sources */,
 				961352952EF1C19800C89E1E /* TDInputAccumulator.swift in Sources */,
+				96230BA62EFED376000AAB7B /* DualKeypadContainer.swift in Sources */,
 				96CCC1092EF536640062AC7C /* LCDColors.swift in Sources */,
 				9641B4FB2EECC45C00CC67E1 /* TDFormatter.swift in Sources */,
 				9608116E2EF36BE4004A34ED /* LCDBackground.swift in Sources */,
+				96230BA42EFED23C000AAB7B /* WorkDayWindow.swift in Sources */,
 				9607F7F72EF19CF20052427E /* TDCalendarQuantity.swift in Sources */,
 				962FE3382EEC6ED40039826D /* TDOptions.swift in Sources */,
 				962FE3282EEC65550039826D /* TDOperator.swift in Sources */,

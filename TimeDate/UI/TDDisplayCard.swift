@@ -13,7 +13,7 @@ struct TDDisplayCard: View {
     let expression: String
     let result: TDDisplayResult
     let didJustEvaluate: Bool
-    let fixedHeight: CGFloat
+    let fixedHeight: CGFloat?
 
     @Environment(\.colorScheme) private var scheme
 

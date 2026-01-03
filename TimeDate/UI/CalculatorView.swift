@@ -60,7 +60,11 @@ struct CalculatorView: View {
                     WeekdayBarView(active: vm.weekday)
                 }
 
-                KeypadView(vm: vm, layout: layout)
+                KeypadView(
+                    vm: vm,
+                    layout: layout,
+                    keypadLayout: nil
+                )
 
                 Spacer(minLength: 0)
             }

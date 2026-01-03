@@ -24,7 +24,8 @@ struct TDLayout {
 
         // Classes d'appareils
         let isSE = h <= 700
-        let isIPad = w >= 700   // 👈 clé du problème
+        let isIPad = UIDevice.current.userInterfaceIdiom == .pad
+   // 👈 clé du problème
 
         self.isSmallPhone = isSE
 

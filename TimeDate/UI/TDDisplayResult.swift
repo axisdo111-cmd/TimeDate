@@ -9,3 +9,9 @@ struct TDDisplayResult {
     let main: String
     let secondary: String?
 }
+
+extension TDDisplayResult: CustomStringConvertible {
+    var description: String {
+        main
+    }
+}
